@@ -43,3 +43,9 @@ for key, grp in new_df.groupby(['row_name']):
 
 #Calculate the mean 
 prescribe_mean = new_df.groupby(by='date')['items per 1000'].mean() #Calculates mean prescriptions for each month per 1000 registered patients 
+
+#plot a graph of mean precribing over time for whol CCG
+plt.subplots(figsize=(20,10))
+
+ave_plot = plt.plot(prescribe_mean)
+plt.show()
