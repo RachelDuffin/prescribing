@@ -49,3 +49,22 @@ plt.subplots(figsize=(20,10))
 
 ave_plot = plt.plot(prescribe_mean)
 plt.show()
+
+#get standard deviation
+prescribe_desc = new_df.groupby(by='date')['items per 1000'].describe()
+print(prescribe_desc)
+
+#take standard deviation away from mean and add to mean so that these can be plotted
+mean_min_std = prescribe_desc['mean'] - prescribe_desc['std']
+mean_add_std = prescribe_desc['mean'] + prescribe_desc['std']
+
+prescribe_desc['mean_min_std'] = mean_min_std
+prescribe_desc['mean_add_std'] = mean_add_std
+
+#check mean take away std and add std has been added to dataframe
+print(prescribe_desc)
+
+plt.subplots(figsize=(20,10))
+
+ave_plot = plt.plot(prescribe_desc)
+plt.show()
