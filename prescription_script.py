@@ -26,7 +26,7 @@ new_df = pd.merge(spendingdf, listsizedf, on=['row_id','date', 'row_name']) #mer
 
 #Plot graph of prescribed items over time for each practice in Manchester CCG---------------------------------------------------------------------------------------------------------------------------------
 
-#Basic graph (not normalised)
+#Basic graph 
 fig, ax = plt.subplots(figsize=(30,10)) #Plots graph of size 30,10
 
 for key, grp in new_df.groupby(['row_name']): 
