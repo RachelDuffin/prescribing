@@ -1,16 +1,11 @@
 #!/usr/bin/python
 
-#pip3 install requests
-#pip3 install numpy
-#pip3 install pandas
+#pip3 install requests numpy pandas 
 
 #Import required packages----------------------------------------------------------------------------------------------------------------------------------------------------------------
 import requests, csv, json, sys
 import numpy as np
 import pandas as pd
-
-
-#Part 1 - Comparing number of antibiotics prescribed per patient per GP practice on average in Manchester CCG---------------------------------------------------------------------------------------
 
 #Download the data using APIs and load into pandas dataframe------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +21,7 @@ print(listsizedf) #prints the listsize dataframe
 
 #Merge the two pandas data frames--------------------------------------------------------------------------------------------------------------------------------------------------------
 
-new_df = pd.merge(spendingdf, listsizedf, on=['row_id','date']) #merges the data frames on 'row_id' and 'date'
+new_df = pd.merge(spendingdf, listsizedf, on=['row_id','date', 'row_name']) #merges the data frames on 'row_id' and 'date'
 
 #Graphs---------------------------------------------------------------------------------------------------------------------------------
 
