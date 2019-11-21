@@ -26,6 +26,7 @@ new_df = pd.merge(spendingdf, listsizedf, on=['row_id','date', 'row_name']) #mer
 #Graphs---------------------------------------------------------------------------------------------------------------------------------
 
 #plot graph of prescribed items over time for each practice in Manchester CCG
+#import package to plot graphs
 import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots()
@@ -33,9 +34,9 @@ fig, ax = plt.subplots()
 for key, grp in new_df.groupby(['row_name']):
     ax = grp.plot(ax=ax, kind='line', x='date', y='items', label=key)
 
-#create new column in dataframe of number of prescribed items per 1,000 registered patients
+#create a new column in dataframe that gives prescribed items per 1000 patients to normalise data as some practices are smaller than others
 new_df['items per 1000'] = new_df['items']/new_df['total_list_size']*1000
-#check column by printing dataframe
+#check column has appended correctly
 print(new_df)
 
 #plot graph prescribed items per 1,000 patients over time for each practice in Manchester CCG
