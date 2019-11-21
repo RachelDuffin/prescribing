@@ -26,17 +26,20 @@ new_df = pd.merge(spendingdf, listsizedf, on=['row_id','date', 'row_name']) #mer
 
 #Plot graph of prescribed items over time for each practice in Manchester CCG---------------------------------------------------------------------------------------------------------------------------------
 
-#Basic graph 
+#Basic graph (not normalised)
 fig, ax = plt.subplots(figsize=(30,10)) #Plots graph of size 30,10
 
 for key, grp in new_df.groupby(['row_name']): 
     ax = grp.plot(ax=ax, kind='line', x='date', y='items', label=key) #Specifies graph as line graph, and determines what is on each axis
 
 #Normalised graph (shows prescribed items per 1,000 patients over time for each practice in Manchester CCG)
-new_df['items per 1000'] = new_df['items']/new_df['total_list_size']*1000 #Adds column to dataframe of prescribed items per 1,000 registered patients
-print(new_df) #check column by printing dataframe
+new_df['items per 1000'] = new_df['items']/new_df['total_list_size']*1000 #Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
+print(new_df) #check column has appended correctly by printing dataframe
 
 fig, ax = plt.subplots(figsize=(30,10)) #Plots graph of size 30,10
 
 for key, grp in new_df.groupby(['row_name']):
     ax = grp.plot(ax=ax, kind='line', x='date', y='items per 1000', label=key) #Specifies graph as line graph, and determines what is on each axis
+
+#Calculate the mean 
+prescribe_mean = new_df.groupby(by='date')['items per 1000'].mean() #Calculates mean prescriptions for each month per 1000 registered patients 
