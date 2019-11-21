@@ -26,7 +26,7 @@ print(listsizedf) #prints the listsize dataframe
 
 #Merge the two pandas data frames--------------------------------------------------------------------------------------------------------------------------------------------------------
 
-new_df = pd.merge(spendingdf, listsizedf, on=['row_id','date']) #merges the data frames on 'row_id' and 'date'
+new_df = pd.merge(spendingdf, listsizedf, on=['row_id','date', 'row_name']) #merges the data frames on 'row_id' and 'date'
 
 #Graphs---------------------------------------------------------------------------------------------------------------------------------
 
