@@ -66,5 +66,7 @@ plt.show() #show plot
 #Add a mean line for all CCGs to manchester mean graph
 #Add grey band for standard deviation either side of mean
 #Find outliers for mean graph
+#Add tests
+#Download a dataset to test it with - save a csv file and upload to github
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
