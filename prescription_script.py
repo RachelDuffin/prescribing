@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 
-#pip3 install requests numpy pandas matplotlib
+#pip3 install requests pandas matplotlib
 
-#Import required packages-------------------------------------------------------------------------------------------------------------------------------------------------------
-import requests, csv, json, sys
-import numpy as np
+#Import required packages------------------------------------------------------------------------------------------------------------------------------------------------------
+import requests, csv, json
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -22,7 +21,7 @@ new_df = pd.merge(download(API=spendingAPI), download(API= listsizeAPI), on=['ro
 new_df['items per 1000'] = new_df['items']/new_df['total_list_size']*1000 #Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
 print(new_df) #prints to check df is correct and check normalised column has appended correctly
 
-#Plot graphs of prescribed items over time for each practice in Manchester CCG---------------------------------------------------------------------------------------------------
+#Plot graphs of prescribed items over time for each practice in Manchester CCG-------------------------------------------------------------------------------------------------
 
 #Define function for plotting graphs
 def plot(x, y, label, xlabel, ylabel):
@@ -34,13 +33,11 @@ def plot(x, y, label, xlabel, ylabel):
         ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key) #Specifies graph as line graph, and determines what is on each axis
     plt.show()
 
-
 #Plot graphs
 plot(x='date', y='items', label = "Antibiotics prescribed by GP practices in Manchester CCG over time", xlabel = "Date", ylabel= "Number of antibiotics prescribed") #plot basic graph showing number of antibiotics prescribed by each practice each month over time
 plot(x='date', y='items per 1000', label = "Graph of antibiotics prescribed per 1000 patients by GP practices in Manchester CCG over time", xlabel = "Date", ylabel = "Number of antibiotics prescribed") #plots normalised graph accounting for patient population size (prescribed items per 1,000 registered patients)
 
-
-#Graph of mean for whole Manchester CCG-----------------------------------------------------------------------------------------------------------------------------------------
+#Graph of mean for whole Manchester CCG----------------------------------------------------------------------------------------------------------------------------------------
 prescribe_desc = new_df.groupby(by='date')['items per 1000'].describe() #Calculates mean and standard deviation across all practices for each month per 1000 registered patients
 print(prescribe_desc) #print to check df is correct and mean/std have been calculated correctly
 
@@ -50,7 +47,7 @@ plt.xlabel("Date")
 plt.ylabel("Antibiotics prescribed per 1000 patients")
 plt.show(plt.plot(prescribe_desc['mean'])) #plots the graph of the mean
 
-#Graph of mean +- 1 standard deviation for Manchester CCG-----------------------------------------------------------------------------------------------------------------
+#Graph of mean +- 1 standard deviation for Manchester CCG----------------------------------------------------------------------------------------------------------------------
 mean_min_std = prescribe_desc['mean'] - prescribe_desc['std'] #calculates mean - standard deviation for plotting
 mean_add_std = prescribe_desc['mean'] + prescribe_desc['std'] #calculates mean + standard deviation for plotting
 
@@ -64,4 +61,10 @@ ave_plot3 = plt.plot(mean_add_std) #plot mean + standard deviation line
 plt.show() #show plot
 
 
+#Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
+#Sort out the graph axis labels
+#Add a mean line for all CCGs to manchester mean graph
+#Add grey band for standard deviation either side of mean
+#Find outliers for mean graph
 
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
