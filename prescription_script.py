@@ -67,13 +67,6 @@ mean_add_std = prescribe_desc['mean'] + prescribe_desc['std']
 prescribe_desc['mean_min_std'] = mean_min_std
 prescribe_desc['mean_add_std'] = mean_add_std
 
-print(prescribe_desc) #check mean take away std and add std has been added to dataframe
-
-plt.subplots(figsize=(20,10)) #plot all description data
-
-ave_plot = plt.plot(prescribe_desc)
-plt.show()
-
 plt.subplots(figsize=(20,10)) #plot mean, plus and minus standard deviation, need to add key
 
 ave_plot = plt.plot(prescribe_mean)
