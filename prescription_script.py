@@ -25,7 +25,7 @@ print(spending) #prints output of function to test output is correct
 listsize = download(API='https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size') #gets total list size per GP practice in Manchester CCG in json format
 print(listsize) #prints the listsize dataframe
 
-new_df = pd.merge(spendingdf, listsizedf, on=['row_id','date', 'row_name']) #merges the two pandas dataframes on 'row_id' and 'date'
+new_df = pd.merge(spending, listsize, on=['row_id','date', 'row_name']) #merges the two pandas dataframes on 'row_id' and 'date'
 
 #Plot graph of prescribed items over time for each practice in Manchester CCG---------------------------------------------------------------------------------------------------
 
