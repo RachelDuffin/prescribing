@@ -68,5 +68,10 @@ plt.show() #show plot
 #Find outliers for mean graph
 #Add tests
 #Download a dataset to test it with - save a csv file and upload to github
+#Possibly create boxplot using .boxplot
+#Remove zeros/append to a file so we know which have been removed?
+#Maybe define some more functions
+#Maybe make a heat map
+#Add min and max practice to our mean line graph
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
