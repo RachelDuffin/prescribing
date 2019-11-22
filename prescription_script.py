@@ -15,17 +15,11 @@ def download(API):
     df = pd.DataFrame.from_dict(requests.get(API).json()) #gets data from API in json format, and creates pandas dataframe from dictionary format of json file 
     return(df)
 
-#MANCHESTER CCG-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+spendingAPI= 'https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L' #API for number of antibiotics prescribed by practice in Manchester CCG
+listsizeAPI= 'https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size' #API for number of patients by practice in Manchester CCG
 
-#Download the data using APIs and load into pandas dataframe--------------------------------------------------------------------------------------------------------------------
-
-spending = download(API='https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L') #gets json file of antibiotics prescribed per practice in Manchester CCG in json format
-print(spending) #prints output of function to test output is correct
-
-listsize = download(API='https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size') #gets total list size per GP practice in Manchester CCG in json format
-print(listsize) #prints the listsize dataframe
-
-new_df = pd.merge(spending, listsize, on=['row_id','date', 'row_name']) #merges the two pandas dataframes on 'row_id' and 'date'
+new_df = pd.merge(download(API=spendingAPI), download(API= listsizeAPI), on=['row_id','date', 'row_name']) #downloads data in json format using APIs and loads into pandas dataframes, then merges dataframes on three columns
+print(new_df) #prints resulting df to check it is correct
 
 #Plot graph of prescribed items over time for each practice in Manchester CCG---------------------------------------------------------------------------------------------------
 
@@ -45,13 +39,11 @@ for key, grp in new_df.groupby(['row_name']):
     ax = grp.plot(ax=ax, kind='line', x='date', y='items per 1000', label=key) #Specifies graph as line graph, and determines what is on each axis
 
 
-#Calculate the mean 
+#Calculate the mean-------------------------------------------------------------------------------------------------------------------------------------------------------------
 prescribe_mean = new_df.groupby(by='date')['items per 1000'].mean() #Calculates mean prescriptions for each month per 1000 registered patients 
 
 
 #Graph of mean for whole Manchester CCG-----------------------------------------------------------------------------------------------------------------------------------------
-prescribe_mean = new_df.groupby(by='date')['items per 1000'].mean() #Calculates mean prescriptions for each month per 1000 registered patients 
-
 plt.subplots(figsize=(20,10)) #plot a graph of mean precribing over time for whole CCG
 
 ave_plot = plt.plot(prescribe_mean)
