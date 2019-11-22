@@ -32,19 +32,16 @@ def plot(x, y):
         ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key) #Specifies graph as line graph, and determines what is on each axis
     plt.show()
 
+#Plot graphs
 plot(x='date', y='items') #plot basic graph showing number of antibiotics prescribed by each practice each month over time
-
 plot(x='date', y='items per 1000') #plots normalised graph accounting for patient population size (prescribed items per 1,000 registered patients)
-
-#Calculate the mean-------------------------------------------------------------------------------------------------------------------------------------------------------------
-prescribe_mean = new_df.groupby(by='date')['items per 1000'].mean() #Calculates mean prescriptions for each month per 1000 registered patients 
 
 
 #Graph of mean for whole Manchester CCG-----------------------------------------------------------------------------------------------------------------------------------------
-plt.subplots(figsize=(20,10)) #plot a graph of mean precribing over time for whole CCG
+prescribe_mean = new_df.groupby(by='date')['items per 1000'].mean() #Calculates mean prescriptions across all practices for each month per 1000 registered patients 
 
-ave_plot = plt.plot(prescribe_mean)
-plt.show()
+plt.subplots(figsize=(20,10)) #specifies size of plot
+plt.show(ave_plot = plt.plot(prescribe_mean)) #plots the graph of the mean
 
 #Graph of mean for whole Manchester CCG with standard deviation-----------------------------------------------------------------------------------------------------------------
 prescribe_desc = new_df.groupby(by='date')['items per 1000'].describe() #get standard deviation
