@@ -15,29 +15,26 @@ def download(API):
     df = pd.DataFrame.from_dict(requests.get(API).json()) #gets data from API in json format, and creates pandas dataframe from dictionary format of json file 
     return(df)
 
+
 spendingAPI= 'https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L' #API for number of antibiotics prescribed by practice in Manchester CCG
 listsizeAPI= 'https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size' #API for number of patients by practice in Manchester CCG
 
 new_df = pd.merge(download(API=spendingAPI), download(API= listsizeAPI), on=['row_id','date', 'row_name']) #downloads data in json format using APIs and loads into pandas dataframes, then merges dataframes on three columns
-print(new_df) #prints resulting df to check it is correct
-
-#Plot graph of prescribed items over time for each practice in Manchester CCG---------------------------------------------------------------------------------------------------
-
-#Basic graph 
-fig, ax = plt.subplots(figsize=(30,10)) #Plots graph of size 30,10
-
-for key, grp in new_df.groupby(['row_name']): 
-    ax = grp.plot(ax=ax, kind='line', x='date', y='items', label=key) #Specifies graph as line graph, and determines what is on each axis
-
-#Normalised graph (shows prescribed items per 1,000 patients over time for each practice in Manchester CCG)---------------------------------------------------------------------
 new_df['items per 1000'] = new_df['items']/new_df['total_list_size']*1000 #Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
-print(new_df) #check column has appended correctly by printing dataframe
+print(new_df) #prints to check df is correct and check normalised column has appended correctly
 
-fig, ax = plt.subplots(figsize=(30,10)) #Plots graph of size 30,10
+#Plot graphs of prescribed items over time for each practice in Manchester CCG---------------------------------------------------------------------------------------------------
 
-for key, grp in new_df.groupby(['row_name']):
-    ax = grp.plot(ax=ax, kind='line', x='date', y='items per 1000', label=key) #Specifies graph as line graph, and determines what is on each axis
+#Define function for plotting graphs
+def plot(x, y):
+    fig, ax = plt.subplots(figsize=(30,10)) #Plots graph of size 30,10
+    for key, grp in new_df.groupby(['row_name']): 
+        ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key) #Specifies graph as line graph, and determines what is on each axis
+    plt.show()
 
+plot(x='date', y='items') #plot basic graph showing number of antibiotics prescribed by each practice each month over time
+
+plot(x='date', y='items per 1000') #plots normalised graph accounting for patient population size (prescribed items per 1,000 registered patients)
 
 #Calculate the mean-------------------------------------------------------------------------------------------------------------------------------------------------------------
 prescribe_mean = new_df.groupby(by='date')['items per 1000'].mean() #Calculates mean prescriptions for each month per 1000 registered patients 
