@@ -15,7 +15,6 @@ def download(API):
     df = pd.DataFrame.from_dict(requests.get(API).json()) #gets data from API in json format, and creates pandas dataframe from dictionary format of json file 
     return(df)
 
-
 spendingAPI= 'https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L' #API for number of antibiotics prescribed by practice in Manchester CCG
 listsizeAPI= 'https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size' #API for number of patients by practice in Manchester CCG
 
@@ -38,24 +37,19 @@ plot(x='date', y='items per 1000') #plots normalised graph accounting for patien
 
 
 #Graph of mean for whole Manchester CCG-----------------------------------------------------------------------------------------------------------------------------------------
-prescribe_mean = new_df.groupby(by='date')['items per 1000'].mean() #Calculates mean prescriptions across all practices for each month per 1000 registered patients 
-
-plt.subplots(figsize=(20,10)) #specifies size of plot
-plt.show(ave_plot = plt.plot(prescribe_mean)) #plots the graph of the mean
-
-#Graph of mean for whole Manchester CCG with standard deviation-----------------------------------------------------------------------------------------------------------------
-prescribe_desc = new_df.groupby(by='date')['items per 1000'].describe() #get standard deviation
+prescribe_desc = new_df.groupby(by='date')['items per 1000'].describe() #Calculates mean and standard deviation across all practices for each month per 1000 registered patients
 print(prescribe_desc)
 
-mean_min_std = prescribe_desc['mean'] - prescribe_desc['std'] #take standard deviation away from mean and add to mean so that these can be plotted
-mean_add_std = prescribe_desc['mean'] + prescribe_desc['std']
+plt.subplots(figsize=(20,10)) #specifies size of plot
+plt.show(plt.plot(prescribe_desc['mean'])) #plots the graph of the mean
 
-prescribe_desc['mean_min_std'] = mean_min_std
-prescribe_desc['mean_add_std'] = mean_add_std
+#Graph of mean for whole Manchester CCG with standard deviation-----------------------------------------------------------------------------------------------------------------
+mean_min_std = prescribe_desc['mean'] - prescribe_desc['std'] #calculates mean - standard deviation for plotting
+mean_add_std = prescribe_desc['mean'] + prescribe_desc['std'] #calculates mean + standard deviation for plotting
 
 plt.subplots(figsize=(20,10)) #plot mean, plus and minus standard deviation, need to add key
 
-ave_plot = plt.plot(prescribe_mean)
+ave_plot = plt.plot(prescribe_desc['mean'])
 ave_plot2 = plt.plot(mean_min_std)
 ave_plot3 = plt.plot(mean_add_std) 
 plt.show()
