@@ -61,6 +61,19 @@ ave_plot3 = plt.plot(mean_add_std) #plot mean + standard deviation line
 plt.show() #show plot
 
 
+#create boxplot to see spread of data for each month
+import seaborn as sns
+plt.figure(figsize=(20, 10))
+bplot = sns.boxplot(x=new_df['date'], y=new_df['items per 1000'])
+
+# output file name
+plot_file_name="boxplot.jpg"
+ 
+# save boxplot as jpeg
+bplot.figure.savefig(plot_file_name,
+                    format='jpeg',
+                    dpi=100)
+
 #Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
 #Sort out the graph axis labels
 #Add a mean line for all CCGs to manchester mean graph
