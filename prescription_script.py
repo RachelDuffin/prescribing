@@ -77,6 +77,34 @@ bplot.figure.savefig(plot_file_name,
                     format='jpeg',
                     dpi=100)
 
+#defines a function to calculate outliers using interquartile range
+def calculate_outliers_iqr_method(values):
+
+    q1 = values.quantile(q=0.25)
+    q3 = values.quantile(q=0.75)
+    iqr = q3 - q1
+
+    outliers = []
+    for value in values:
+        if value > q3 + 1.5*iqr or value < q1 - 1.5*iqr:
+            outliers.append(value)
+
+    return outliers					
+					
+outlier_list = [] # creates an empty list for outliers to be appended to
+date_list = [] # creates an empty list for dates to be appended to
+#prints the outliers for each date
+for date in new_df['date'].unique():
+    outliers = calculate_outliers_iqr_method(new_df[new_df['date'] == date]['items per 1000'])
+    date_list.append(date)
+    outlier_list.append(outliers)
+    print("Outliers for {0}: {1}".format(date, outliers))
+
+date_outlier_list = list(zip(date_list, outlier_list)) # merges the date and outliers lists
+outlier_df = pd.DataFrame(date_outlier_list, columns = ['Date', 'Outliers']) # puts the merged list into a dataframe with two headings
+
+outlier_df.to_csv('outlier.csv') # puts merged list of dates and outliers into a csv	
+					
 #Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
 #Sort out the graph axis labels
 #Add a mean line for all CCGs to manchester mean graph
