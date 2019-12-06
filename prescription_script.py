@@ -45,6 +45,7 @@ plt.subplots(figsize=(20,10)) #specifies size of plot
 plt.title(label='Mean antibiotics prescribed per 1000 patients in Manchester CCG', loc='center', pad=None)
 plt.xlabel("Date")
 plt.ylabel("Antibiotics prescribed per 1000 patients")
+plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are readable
 plt.show(plt.plot(prescribe_desc['mean'])) #plots the graph of the mean
 
 #Graph of mean +- 1 standard deviation for Manchester CCG----------------------------------------------------------------------------------------------------------------------
@@ -58,6 +59,7 @@ plt.ylabel("Antibiotics prescribed per 1000 patients")
 ave_plot = plt.plot(prescribe_desc['mean']) #plot mean line
 ave_plot2 = plt.plot(mean_min_std) #plot mean - standard deviation line
 ave_plot3 = plt.plot(mean_add_std) #plot mean + standard deviation line
+plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are readable
 plt.show() #show plot
 
 
@@ -65,6 +67,7 @@ plt.show() #show plot
 import seaborn as sns
 plt.figure(figsize=(20, 10))
 bplot = sns.boxplot(x=new_df['date'], y=new_df['items per 1000'])
+plt.xticks(rotation=90)
 
 # output file name
 plot_file_name="boxplot.jpg"
