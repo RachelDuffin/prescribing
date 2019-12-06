@@ -106,19 +106,26 @@ def calculate_outliers_iqr_method(values):
     return outliers					
 					
 outlier_list = [] # creates an empty list for outliers to be appended to
-date_list = [] # creates an empty list for dates to be appended to
-#prints the outliers for each date
+
+## uses the outlier function to find the outliers for each month then adds the date and outlier value to a list as a tuple
 for date in new_df['date'].unique():
     outliers = calculate_outliers_iqr_method(new_df[new_df['date'] == date]['items per 1000'])
-    date_list.append(date)
-    outlier_list.append(outliers)
-    print("Outliers for {0}: {1}".format(date, outliers))
+    for outlier in outliers:
+        outlier_list.append([date, outlier])
+		
+outlier_df = pd.DataFrame(outlier_list, columns = ['date', 'items per 1000']) # puts the list of outliers in a dataframe with 2 columns (date and outlier). Outlier column is named 'items per 1000' so that these values can be mapped back to the original dataframe to find the associated practice
+outlier_df.head() # checks dataframe has been created correctly by printing first 5 rows
 
-date_outlier_list = list(zip(date_list, outlier_list)) # merges the date and outliers lists
-outlier_df = pd.DataFrame(date_outlier_list, columns = ['Date', 'Outliers']) # puts the merged list into a dataframe with two headings
+outlier_practice = pd.merge(outlier_df, new_df, on=['date', 'items per 1000']) #merges outlier df with original df using date and items per 1000
 
-outlier_df.to_csv('outlier.csv') # puts merged list of dates and outliers into a csv	
-					
+outlier_practice = outlier_practice.drop(columns = ['setting', 'actual_cost', 'items', 'quantity', 'total_list_size']) # removes columns we don't need in this dataframe
+print(outlier_practice) # prints df to check it's correct
+
+outlier_practice.to_csv('outlier.csv') # puts list of dates and outliers into a csv
+
+
+
+				
 #Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
 #Sort out the graph axis labels
 #Add a mean line for all CCGs to manchester mean graph
