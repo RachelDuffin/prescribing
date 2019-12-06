@@ -107,7 +107,7 @@ def calculate_outliers_iqr_method(values):
 					
 outlier_list = [] # creates an empty list for outliers to be appended to
 
-## uses the outlier function to find the outliers for each month then adds the date and outlier value to a list as a tuple
+# uses the outlier function to find the outliers for each month then adds the date and outlier value to a list as a tuple
 for date in new_df['date'].unique():
     outliers = calculate_outliers_iqr_method(new_df[new_df['date'] == date]['items per 1000'])
     for outlier in outliers:
@@ -123,7 +123,16 @@ print(outlier_practice) # prints df to check it's correct
 
 outlier_practice.to_csv('outlier.csv') # puts list of dates and outliers into a csv
 
-
+# plot outliers on graph of the mean
+fig, ax = plt.subplots(figsize=(20,10)) #creates a space to plot the graph
+plt.title(label='Prescription outliers in Manchester CCG', loc='center', pad=None) #specifies title of plot
+plt.xlabel("Date") #specifies label of the x-axis
+plt.ylabel("Antibiotics prescribed per 1000 patients") #specifies label for y-axis
+ave_plot = ax.plot(prescribe_desc.index.values, prescribe_desc['mean'], label = 'Mean') #plots mean line
+ax = sns.scatterplot(x='Date', y='Items per 1000', data=outlier_practice, hue='Practice', marker = 'x') #uses the outlier data to plot a scatter graph with each practice a different colour
+ax.legend() #creates a key using the label values
+plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are readable
+plt.show() #show plot
 
 				
 #Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
