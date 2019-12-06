@@ -26,9 +26,9 @@ try:
 
 except:
 	prescribe_data = pd.read_csv("spending-by-practice-0501.csv") #csv of number of antibiotics by practice in Manchester CCG, data same as spendingAPI
-    size_data = pd.read_csv("Total-list-size-14L.csv") #csv of number of patients by practive in Manchester CCG, data same as listsizeAPI
+	size_data = pd.read_csv("Total-list-size-14L.csv") #csv of number of patients by practive in Manchester CCG, data same as listsizeAPI
 
-    new_df = pd.merge(prescribe_data, size_data, on=['row_id','date', 'row_name'])
+	new_df = pd.merge(prescribe_data, size_data, on=['row_id','date', 'row_name'])
 
 new_df['items per 1000'] = new_df['items']/new_df['total_list_size']*1000 #Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
 print(new_df) #prints to check df is correct and check normalised column has appended correctly
@@ -43,7 +43,8 @@ def plot(x, y, label, xlabel, ylabel):
     plt.ylabel(ylabel)
     for key, grp in new_df.groupby(['row_name']): 
         ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key) #Specifies graph as line graph, and determines what is on each axis
-    plt.show()
+    ax.legend(bbox_to_anchor=(1.01, 1.05), ncol = 2) # moves the legend so that it sits outside the plot and has two columns
+	plt.show()
 
 #Plot graphs
 plot(x='date', y='items', label = "Antibiotics prescribed by GP practices in Manchester CCG over time", xlabel = "Date", ylabel= "Number of antibiotics prescribed") #plot basic graph showing number of antibiotics prescribed by each practice each month over time
@@ -129,7 +130,7 @@ plt.title(label='Prescription outliers in Manchester CCG', loc='center', pad=Non
 plt.xlabel("Date") #specifies label of the x-axis
 plt.ylabel("Antibiotics prescribed per 1000 patients") #specifies label for y-axis
 ave_plot = ax.plot(prescribe_desc.index.values, prescribe_desc['mean'], label = 'Mean') #plots mean line
-ax = sns.scatterplot(x='Date', y='Items per 1000', data=outlier_practice, hue='Practice', marker = 'x') #uses the outlier data to plot a scatter graph with each practice a different colour
+ax = sns.scatterplot(x='date', y='items per 1000', data=outlier_practice, hue='row_name', marker = 'x') #uses the outlier data to plot a scatter graph with each practice a different colour
 ax.legend() #creates a key using the label values
 plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are readable
 plt.show() #show plot
