@@ -135,6 +135,17 @@ ax.legend() #creates a key using the label values
 plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are readable
 plt.show() #show plot
 
+
+#pivot df to be by practice and create a heatmap
+data_by_practice = new_df.pivot(index='row_name', columns='date', values='items per 1000') # pivots data frame so that it gives items per 1000 by practice over time
+
+data_by_practice.head() # previews first 5 rows to check data frame has been pivotted correctly
+
+
+plt.title(label='Antibiotics prescribed per 1000 patients in Manchester CCG by practice', loc='center', pad=None) #specifies title of plot
+
+sns.heatmap(data_by_practice, cmap='coolwarm', robust=True) # plots a heatmap where low prescribing is blue and high prescribing is red, robust sets contrast levels based on quantiles
+
 				
 #Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
 #Sort out the graph axis labels
