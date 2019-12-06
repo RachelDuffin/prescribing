@@ -61,16 +61,18 @@ plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are rea
 plt.show(plt.plot(prescribe_desc['mean'])) #plots the graph of the mean
 
 #Graph of mean +- 1 standard deviation for Manchester CCG----------------------------------------------------------------------------------------------------------------------
-mean_min_std = prescribe_desc['mean'] - prescribe_desc['std'] #calculates mean - standard deviation for plotting
-mean_add_std = prescribe_desc['mean'] + prescribe_desc['std'] #calculates mean + standard deviation for plotting
-
-plt.subplots(figsize=(20,10)) #plot mean, plus and minus standard deviation, need to add key
+fig, ax = plt.subplots(figsize=(20,10)) #plot mean, plus and minus standard deviation, need to add key
 plt.title(label='Mean plus minus one standard deviation of antibiotics prescribed per 1000 patients in Manchester CCG', loc='center', pad=None)
 plt.xlabel("Date")
 plt.ylabel("Antibiotics prescribed per 1000 patients")
-ave_plot = plt.plot(prescribe_desc['mean']) #plot mean line
-ave_plot2 = plt.plot(mean_min_std) #plot mean - standard deviation line
-ave_plot3 = plt.plot(mean_add_std) #plot mean + standard deviation line
+ave_plot = ax.plot(prescribe_desc.index.values, prescribe_desc['mean'], label = 'Mean') #plot mean line
+plt.fill_between(prescribe_desc.index.values, prescribe_desc['mean'] - prescribe_desc['std'], prescribe_desc['mean'] + prescribe_desc['std'], color='#888888', alpha=0.4, label = 'Standard deviation') #shades in grey one standard deviation above and below the mean, in brackets the x-axis values are specified, then the lower values on the y-axis followed by upper values
+
+ave_plot4 = ax.plot(prescribe_desc.index.values, prescribe_desc['min'], label = 'Minimum') #plots minimum values for each date
+ave_plot4 = ax.plot(prescribe_desc.index.values, prescribe_desc['max'], label = 'Maximum') #plots maximum values for each date
+
+ax.legend() #creates a key using the label values
+
 plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are readable
 plt.show() #show plot
 
