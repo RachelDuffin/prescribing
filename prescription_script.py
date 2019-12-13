@@ -6,6 +6,7 @@
 import requests, csv, json
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 #Define functions--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +37,8 @@ print(new_df) #prints to check df is correct and check normalised column has app
 #Plot graphs of prescribed items over time for each practice in Manchester CCG-------------------------------------------------------------------------------------------------
 
 #Define function for plotting graphs
-def plot(x, y, label, xlabel, ylabel):
+
+def plot(x, y, label, xlabel, ylabel, name):
     fig, ax = plt.subplots(figsize=(30,10)) #Plots graph of size 30,10
     plt.title(label, loc='center', pad=None)
     plt.xlabel(xlabel)
@@ -44,25 +46,28 @@ def plot(x, y, label, xlabel, ylabel):
     for key, grp in new_df.groupby(['row_name']): 
         ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key) #Specifies graph as line graph, and determines what is on each axis
     ax.legend(bbox_to_anchor=(1.01, 1.05), ncol = 2) # moves the legend so that it sits outside the plot and has two columns
-	plt.show()
+    fig.savefig('{}.png'.format(name), format='png', dpi=200) #save figure as png with specified name
+    plt.close(fig)
 
 #Plot graphs
-plot(x='date', y='items', label = "Antibiotics prescribed by GP practices in Manchester CCG over time", xlabel = "Date", ylabel= "Number of antibiotics prescribed") #plot basic graph showing number of antibiotics prescribed by each practice each month over time
-plot(x='date', y='items per 1000', label = "Graph of antibiotics prescribed per 1000 patients by GP practices in Manchester CCG over time", xlabel = "Date", ylabel = "Number of antibiotics prescribed") #plots normalised graph accounting for patient population size (prescribed items per 1,000 registered patients)
+plot(x='date', y='items', label = "Antibiotics prescribed by GP practices in Manchester CCG over time", name="antibiotics_prescribed_in_Manchester_over_time", xlabel = "Date", ylabel= "Number of antibiotics prescribed") #plot basic graph showing number of antibiotics prescribed by each practice each month over time
+plot(x='date', y='items per 1000', label = "Graph of antibiotics prescribed per 1000 patients by GP practices in Manchester CCG over time", name="normalised_antibiotics_prescribed_in_manchester_over_time", xlabel = "Date", ylabel = "Number of antibiotics prescribed") #plots normalised graph accounting for patient population size (prescribed items per 1,000 registered patients)
 
 #Graph of mean for whole Manchester CCG----------------------------------------------------------------------------------------------------------------------------------------
 prescribe_desc = new_df.groupby(by='date')['items per 1000'].describe() #Calculates mean and standard deviation across all practices for each month per 1000 registered patients
 print(prescribe_desc) #print to check df is correct and mean/std have been calculated correctly
 
-plt.subplots(figsize=(20,10)) #specifies size of plot
-plt.title(label='Mean antibiotics prescribed per 1000 patients in Manchester CCG', loc='center', pad=None)
-plt.xlabel("Date")
-plt.ylabel("Antibiotics prescribed per 1000 patients")
+fig, ax = plt.subplots(figsize=(20,10)) #specifies size of plot
+plt.title(label='Mean antibiotics prescribed per 1000 patients in Manchester CCG', loc='center', pad=None) #specify graph title and positioning
+plt.xlabel("Date") #specify x-axis label
+plt.ylabel("Antibiotics prescribed per 1000 patients") #specify y-axis label
 plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are readable
 plt.show(plt.plot(prescribe_desc['mean'])) #plots the graph of the mean
+fig.savefig('Normalised_mean_antibiotics.png', format='png', dpi=200) #save figure as png
+plt.close(fig)
 
 #Graph of mean +- 1 standard deviation for Manchester CCG----------------------------------------------------------------------------------------------------------------------
-fig, ax = plt.subplots(figsize=(20,10)) #plot mean, plus and minus standard deviation, need to add key
+fig, ax = plt.subplots(figsize=(20,10)) #specify figure size
 plt.title(label='Mean plus minus one standard deviation of antibiotics prescribed per 1000 patients in Manchester CCG', loc='center', pad=None)
 plt.xlabel("Date")
 plt.ylabel("Antibiotics prescribed per 1000 patients")
@@ -75,22 +80,15 @@ ave_plot4 = ax.plot(prescribe_desc.index.values, prescribe_desc['max'], label = 
 ax.legend() #creates a key using the label values
 
 plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are readable
-plt.show() #show plot
+fig.savefig('Mean_and_sd_antibiotics_per_1000_patients.png', format='png', dpi=200) #save figure as png
 
-
-#create boxplot to see spread of data for each month
-import seaborn as sns
-plt.figure(figsize=(20, 10))
-bplot = sns.boxplot(x=new_df['date'], y=new_df['items per 1000'])
-plt.xticks(rotation=90)
-
-# output file name
-plot_file_name="boxplot.jpg"
- 
-# save boxplot as jpeg
-bplot.figure.savefig(plot_file_name,
-                    format='jpeg',
-                    dpi=100)
+#Boxplot showing spread of data within each month------------------------------------------------------------------------------------------------------------------------------
+plt.figure(figsize=(20, 10)) #plot figure of size 20,10
+fig = sns.boxplot(x=new_df['date'], y=new_df['items per 1000']) #use seaborn to plot boxplot of month vs antibiotics prescribed per 1000 patients
+plt.xticks(rotation=90) #plots the x labels at a 90 degree rotation
+fig.figure.savefig("boxplot.png",
+                    format='png',
+                    dpi=200)
 
 #defines a function to calculate outliers using interquartile range
 def calculate_outliers_iqr_method(values):
@@ -148,7 +146,7 @@ sns.heatmap(data_by_practice, cmap='coolwarm', robust=True) # plots a heatmap wh
 
 				
 #Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
-#Sort out the graph axis labels
+
 #Add a mean line for all CCGs to manchester mean graph
 #Add grey band for standard deviation either side of mean
 #Find outliers for mean graph
