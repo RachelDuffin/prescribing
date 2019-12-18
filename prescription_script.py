@@ -26,7 +26,7 @@ try:
         listsizeAPI= 'https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size' #API for number of patients by practice in Manchester CCG
         prescribing_df = pd.merge(download(API=spendingAPI), download(API= listsizeAPI), on=['row_id','date', 'row_name']) #downloads data in json format using APIs and loads into pandas dataframes, then merges dataframes on three columns
     except:
-            print("Data could not be downloaded from APIs, trying csv files")
+        print("Data could not be downloaded from APIs, trying csv files")
     else:
         print("Data successfully downloaded from API.")
 except:
@@ -35,9 +35,9 @@ except:
 	    size_data = pd.read_csv("Total-list-size-14L.csv") #csv of number of patients by practive in Manchester CCG, data same as listsizeAPI
 	    prescribing_df = pd.merge(prescribe_data, size_data, on=['row_id','date', 'row_name'])
     except:
-            print("Data could not be loaded from csv files")
+        print("Data could not be loaded from csv files")
     else:
-            print("Data successfully loaded from csv files:")
+        print("Data successfully loaded from csv files:")
 
 #Define functions-------------------------------------------------------------------------------------------------
 
@@ -52,12 +52,12 @@ def calculate_outliers_iqr_method(values):
     for value in values:
         if value > q3 + 1.5*iqr or value < q1 - 1.5*iqr:
             outliers.append(value)
-
     return outliers		
 
 #Line plots
 
 def line_plot(x, y, title, xlabel, ylabel, filename, multi_line_graph, whole_ccg):
+    plt.title(title, loc='center', pad=None) #specify graph title and positioning ylabel, filename, multi_line_graph, whole_ccg):
     fig, ax = plt.subplots(figsize=(30,10)) #Plots graph of size 30,10
     plt.title(title, loc='center', pad=None)
     plt.xlabel(xlabel)
@@ -87,38 +87,49 @@ def std_ccg(x, y, title, xlabel, ylabel, filename, min, max, std):
     plt.close(fig.savefig('{}.png'.format(filename), format='png', dpi=200)) #save figure as png	
 
 #Scatter plot on mean line plot
-def scatter(x, y, title, xlabel, ylabel, filename, scatter_x, scatter_y, data, hue):
+def scatter(x, y, title, xlabel, ylabel, filename, scatter_x, scatter_y, hue, data):
     fig, ax = plt.subplots(figsize=(20,10)) #creates a space to plot the graph
-    plt.title(title, loc='center', pad=None) #specifies title of plot
+    plt.title(title, loc='center', pad=None) #specify graph title and positioning
     plt.xlabel(xlabel) #specifies label of the x-axis
     plt.ylabel(ylabel) #specifies label for y-axis
     plt.xticks(rotation=90) #rotates the axis labels 90 degrees so that they are readable(self, parameter_list):
-    ave_plot = ax.plot(x, y, label = 'Mean') #plots mean line
-    ax = sns.scatterplot(scatter_x, scatter_y, data, hue, marker = 'x') #uses the outlier data to plot a scatter graph with each practice a different colour
-    ax.legend() #creates a key using the label values
+    ax.plot(x, y, label = 'Mean') #plots mean line
+    ax = sns.scatterplot(x = scatter_x, y = scatter_y, hue = hue, data = data, legend = 'full') #uses the outlier data to plot a scatter graph with each practice a different colour
     plt.close(fig.savefig('{}.png'.format(filename), format='png', dpi=200)) #save figure as png	
 
 #Calculations ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #Calculate prescribed items per 1000 patients at each practice
-prescribing_df['items per 1000'] = prescribing_df['items']/prescribing_df['total_list_size']*1000 #Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
+prescribing_df['items_per_1000'] = prescribing_df['items']/prescribing_df['total_list_size']*1000 #Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
 
 #calculate mean and standard deviation across all practices per month
-prescribe_desc = prescribing_df.groupby(by='date')['items per 1000'].describe().reset_index() #Calculates mean and standard deviation across all practices for each month per 1000 registered patients
+prescribe_desc = prescribing_df.groupby(by='date')['items_per_1000'].describe() #Calculates mean and standard deviation across all practices for each month per 1000 registered patients
 
 #Caclulate outliers using outlier function
 
 outlier_list = [] # creates an empty list for outliers to be appended to
  
 for date in prescribing_df['date'].unique():
-    outliers = calculate_outliers_iqr_method(prescribing_df[prescribing_df['date'] == date]['items per 1000'])
+    outliers = calculate_outliers_iqr_method(prescribing_df[prescribing_df['date'] == date]['items_per_1000'])
     for outlier in outliers:
         outlier_list.append([date, outlier]) #determines outliers for each month and adds date and outlier value to a list as a tuple
 
+
+outlier_df = pd.DataFrame(outlier_list, columns = ['date', 'items_per_1000']) # puts the list of outliers in a dataframe with 2 columns (date and outlier). Outlier column is named 'items per 1000' so that these values can be mapped back to the original dataframe to find the associated practice
+
+outlier_practice = pd.merge(outlier_df, prescribing_df, on=['date', 'items_per_1000']) #merges outlier df with original df using date and items per 1000
+
+outlier_practice = outlier_practice.drop(columns = ['setting', 'actual_cost', 'items', 'quantity', 'total_list_size']) # removes columns we don't need in this dataframe
+
+
 #Add outliers to the original dataframe
-outlier_practice = pd.merge((pd.DataFrame(outlier_list, columns = ['date', 'items per 1000'])),  # creates dataframe of date and outliers (column named 'items per 1000' so values can be mapped back to the original dataframe to find the associated practice
-                    pd.DataFrame(prescribing_df, columns = ['date', 'items per 1000', 'row_id', 'ccg', 'row_name']), #select the columns from the original dataframe that we need
-                    on=['date', 'items per 1000']) #Merge created dataframe with original prescribing dataframe on 'date' and 'items per 1000'
+#outlier_practice = pd.merge((pd.DataFrame(outlier_list, columns = ['date', 'items per 1000'])),  # creates dataframe of date and outliers (column named 'items per 1000' so values can be mapped back to the original dataframe to find the associated practice
+ #                   pd.DataFrame(prescribing_df, columns = ['date', 'items per 1000', 'row_id', 'ccg', 'row_name']), #select the columns from the original dataframe that we need
+  #                  on=['date', 'items per 1000']) #Merge created dataframe with original prescribing dataframe on 'date' and 'items per 1000'
+
+#outlier_practice.index = outlier_practice['date'] #'date' column was the index, so this adds it as a column
+#outlier_practice = outlier_practice.reset_index(drop=True)
+#print(outlier_practice)
 
 #Plot graphs of prescribed items over time for each practice in Manchester CCG (using defined functions)-------------------------------------------------------------------------------------------------
 
@@ -130,7 +141,7 @@ practice_plot = line_plot(x='date', y='items',
                 multi_line_graph=True, whole_ccg=False) #plot basic graph showing number of antibiotics prescribed by each practice each month over time
 
 #Plot graph of normalised antibiotics prescribed by GP practices in Manchester over time
-mean_practice_plot = line_plot(x='date', y='items per 1000', 
+mean_practice_plot = line_plot(x='date', y='items_per_1000', 
                     title = "Graph of antibiotics prescribed per 1000 patients by GP practices in Manchester CCG over time", 
                     filename="normalised_antibiotics_prescribed_in_manchester_over_time", 
                     xlabel = "Date", ylabel = "Number of antibiotics prescribed", 
@@ -153,28 +164,33 @@ mean_std_ccg_plot = std_ccg(x = prescribe_desc.index.values, y =  prescribe_desc
                     min = prescribe_desc['min'],
                     max = prescribe_desc['max'],
                     std = prescribe_desc['std'],
-                    filename = "Mean_and_sd_antibiotics_per_1000_patients",
-                    )
+                    filename = "Mean_and_sd_antibiotics_per_1000_patients")
 
-#Plot boxplot showing spread of data within each month- IS SHOWING SOME ERRORS IN THIS SECTION!-----------------------------------------------------------------------------------------------------------------------------
+#Plot boxplot showing spread of data within each month-----------------------------------------------------------------------------------------------------------------------------
+
 plt.figure(figsize=(20, 10)) #plot figure of size 20,10
-fig = sns.boxplot(x=prescribing_df['date'], y = prescribing_df['items per 1000']) #use seaborn to plot boxplot of month vs antibiotics prescribed per 1000 patients
+fig = sns.boxplot(prescribing_df['date'], prescribing_df['items_per_1000']) #use seaborn to plot boxplot of month vs antibiotics prescribed per 1000 patients
 plt.xticks(rotation=90) #plots the x labels at a 90 degree rotation
-fig.figure.savefig("boxplot.png",
-                    format='png',
-                    dpi=200)			
+plt.title(label= 'Boxplot showing antibiotics prescribed per 1000 patients in Manchester CCG per month', loc='center', pad=None) #specifies title of plot
+fig.figure.savefig("boxplot.png", format='png', dpi=200)			
+
+#plotdata=pd.DataFrame(prescribing_df, columns = ['date', 'items per 1000'])
+
+#pd.DataFrame.to_string(prescribing_df)
 
 #Plot outliers on graph of the mean- IS SHOWING SOME ERRORS IN THIS SECTION!
-outliers_line_graph = scatter(x= prescribe_desc.index.values, y= prescribe_desc['mean'], 
+
+outliers_line_graph = scatter(x = prescribe_desc.index.values, y =  prescribe_desc['mean'], 
                         title = 'Prescription outliers in Manchester CCG',
                         xlabel = 'Date',
                         ylabel = 'Antibiotics prescribed per 1000 patients',
                         filename = 'Prescription_outliers_in_Manchester_CCG',
-                        scatter_x = prescribe_desc['date'] , scatter_y = prescribe_desc['items per 1000'], 
-                        hue=prescribe_desc['row_name'], data = outlier_practice)
+                        scatter_x = outlier_practice.date, scatter_y = outlier_practice.items_per_1000,
+                        hue = outlier_practice.row_name, data=outlier_practice
+                        )
 
 #Create a heatmap- WORKS FINE--------------------------------------------------------------------------------------------------------------------------------------------------------------
-data_by_practice = prescribing_df.pivot(index='row_name', columns='date', values='items per 1000') #pivots data frame so that it gives items per 1000 by practice over time
+data_by_practice = prescribing_df.pivot(index='row_name', columns='date', values='items_per_1000') #pivots data frame so that it gives items per 1000 by practice over time
 
 fig, ax = plt.subplots(figsize=(20,20))   #specify figure size
 plt.title(label='Antibiotics prescribed per 1000 patients in Manchester CCG by practice', loc='center', pad=None) #specifies title of plot
@@ -184,11 +200,7 @@ fig.savefig("Heatmap.png", format = 'png', dpi = 200)
 
 #Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#Add a mean line for all CCGs to manchester mean graph
 #Add tests
-#Remove zeros/append to a file so we know which have been removed?
-#Maybe define some more functions
-#Add min and max practice to our mean line graph
 #make an output saying graph plotted successfully after each graph 
 #make output saying 'table is the expected size'
 
