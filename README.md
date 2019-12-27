@@ -62,7 +62,7 @@ This will create a set of six graphical outputs, which can be found in the graph
 ![](/prescribing/graphs/Prescription_outliers_in_Manchester_CCG.png)
 
 ### Box plot of antibiotics prescribed in Manchester CCG:
-![](graphs/figure%20Box_plot.png)
+![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/Box_plot.png)
 
 ### Heatmap of antibotics prescribed in Manchester CCG:
 ![](/prescribing/graphs/heatmap.png)
