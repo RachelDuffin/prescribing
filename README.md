@@ -41,7 +41,7 @@ The packages required to run the script are located in 'requirements.txt'. To in
 pip3 install -r requirements.txt
 ```
 
-## Analytical output
+## Graphical output
 
 To run the python script, run:
 ```
