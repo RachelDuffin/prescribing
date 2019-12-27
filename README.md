@@ -49,8 +49,7 @@ python3 prescription_script.py
 ```
 This will create a set of six graphical outputs, which can be found in the graphs directory.
 
-### Antibiotics prescribed in Manchester CCG:
-![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/antibiotics_prescribed_in_Manchester_over_time.png)
+![Antibiotics prescribed in Manchester CCG](https://github.com/RachelDuffin/prescribing/blob/master/graphs/antibiotics_prescribed_in_Manchester_over_time.png)
 
 ### Normalised antibotics prescribed in Manchester CCG:
 ![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/normalised_antibiotics_prescribed_in_manchester_over_time.png)
