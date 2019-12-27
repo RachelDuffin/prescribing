@@ -14,8 +14,6 @@ from pathlib import Path
 # Define functions-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Set text size for plots - FINISHED
-
-
 def text_size(SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE):
     # fontsize of the axes title, and x and y labels
     plt.rc('axes', titlesize=BIGGER_SIZE, labelsize=MEDIUM_SIZE)
@@ -31,7 +29,6 @@ def get_api_data(api):
         return pd.DataFrame.from_dict(requests.get(api).json())
     except:
         print("Could not download from API")
-
 
 def get_csv_data(csv):
     try:
@@ -70,7 +67,6 @@ def download(spendingAPI, listsizeAPI):  # specifies inputs for defined function
 
 
 # Calculation of outliers using interquartile range
-# defines function for outlier calculation, with input 'values'
 def calculate_outliers_iqr_method(values):
     q1 = values.quantile(q=0.25)  # calculates lower quartile
     q3 = values.quantile(q=0.75)  # calculates upper quartlie
@@ -84,9 +80,12 @@ def calculate_outliers_iqr_method(values):
     return outliers
 
 # Merge outliers with original dataframe
+
+
 def outlier_merge(outlier_list, original_df, columns):
     subset = pd.DataFrame(original_df[['date', 'items_per_1000', 'row_name']])
-    outlier_practice = pd.merge(outlier_list, subset, on=columns)  # puts outliers list into a dataframe with 2 columns, and merges on 'date' and 'items_per_1000' with a subset of prescribing_df     
+    # puts outliers list into a dataframe with 2 columns, and merges on 'date' and 'items_per_1000' with a subset of prescribing_df
+    return pd.merge(outlier_list, subset, on=columns)
 
 # Line plots
 # specifies inputs for defined function
@@ -143,26 +142,32 @@ def scatter(x, y, title, xlabel, ylabel, filename, scatter_x, scatter_y, hue, da
     plt.xticks(rotation=90)
     ax.plot(x, y, label='Mean')  # plots mean line
     # plots outlier data as scatter graph (each practice is a different colour)
-    ax = sns.scatterplot(x=scatter_x, y=scatter_y, hue=hue, data=data, legend='full')
-    return plt.close(fig.savefig('{}.png'.format(filename), format='png', dpi=200))  # save figure as png with specified name
+    ax = sns.scatterplot(x=scatter_x, y=scatter_y,
+                         hue=hue, data=data, legend='full')
+    # save figure as png with specified name
+    return plt.close(fig.savefig('{}.png'.format(filename), format='png', dpi=200))
 
 # plots a heatmap where low prescribing is blue and high prescribing is red, robust sets contrast levels based on quantiles
-def heatmap (df, index, columns, values, title ):
-    data_by_practice = df.pivot(index, columns, values) # pivots data frame so that it gives items per 1000 by practice over time
+
+
+def heatmap(df, index, columns, values, title, filename):
+    # pivots data frame so that it gives items per 1000 by practice over time
+    data_by_practice = df.pivot(index, columns, values)
     fig, ax = plt.subplots(figsize=(20, 20))  # specify figure size
     plt.title(label=title, loc='center', pad=None)  # specifies title of plot
-    plot = sns.heatmap(data_by_practice, cmap='coolwarm', robust=True) #plots the heatmap 
+    plot = sns.heatmap(data_by_practice, cmap='coolwarm',
+                       robust=True)  # plots the heatmap
     fig = plot.get_figure()
-    fig.savefig('{}.png'.format(filename), format='png', dpi=200) #plots and saves figure
+    return fig.savefig('{}.png'.format(filename), format='png',
+                dpi=200)  # plots and saves figure
 
 
 # Main method ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Set graph text sizes
-text_size(SMALL_SIZE=10, MEDIUM_SIZE=14, BIGGER_SIZE=18)
-
-
 def main():
+    # Set graph text sizes
+    text_size(SMALL_SIZE=10, MEDIUM_SIZE=14, BIGGER_SIZE=18)
+
     # Download data from APIs
     prescribing_df = download(spendingAPI='https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L',  # API for number of antibiotics prescribed by practice in Manchester CCG
                               # API for number of patients by practice in Manchester CCG
@@ -175,8 +180,9 @@ def main():
 
     # calculate mean and standard deviation across all practices per month
     # Calculates mean and standard deviation across all practices for each month per 1000 registered patients
-    prescribe_desc = prescribing_df.groupby('date')['items_per_1000'].describe().reset_index()
-    
+    prescribe_desc = prescribing_df.groupby(
+        'date')['items_per_1000'].describe().reset_index()
+
     # Caclulate outliers using outlier function
     outlier_list = []  # creates an empty list for outliers to be appended to
     # determines outliers for each month, and add date and outlier to list as a tuple
@@ -186,10 +192,11 @@ def main():
         # append calculated outliers to list
         for outlier in outliers:
             outlier_list.append([date, outlier])
-    outlier_list = pd.DataFrame(outlier_list, columns = ['date', 'items_per_1000'])
-    
+    outlier_list = pd.DataFrame(outlier_list, columns=[
+                                'date', 'items_per_1000'])
+
     # Merge outliers with the original dataframe
-    outlier_practice = outlier_merge(outlier_list=outlier_list, original_df=prescribing_df, columns = ['date', 'items_per_1000'])
+    outlier_practice = outlier_merge(outlier_list=outlier_list, original_df=prescribing_df, columns=['date', 'items_per_1000'])
 
     # Plot graphs of prescribed items over time for each practice in Manchester CCG (using defined functions)-------------------------------------------------------------------------------------------------
 
@@ -217,14 +224,20 @@ def main():
               loc='center', pad=None)  # specifies title of plot
     fig.figure.savefig("boxplot.png", format='png', dpi=200)
 
-    # Plot graph of mean with outliers- NOT WORKING! AttributeError: 'NoneType' object has no attribute 'date'------------------------------------------------------------------------------------------------------------------------------------------------------------
-    
-    outliers_line_graph = scatter(x=prescribe_desc['date'], y=prescribe_desc['mean'], title='Prescription outliers in Manchester CCG', xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients', filename='Prescription_outliers_in_Manchester_CCG', scatter_x=outlier_practice.date, scatter_y=outlier_practice.items_per_1000, hue=outlier_practice.row_name, data=outlier_practice)
+    # Plot graph of mean with outliers------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    outliers_line_graph = scatter(x=prescribe_desc['date'], y=prescribe_desc['mean'], title='Prescription outliers in Manchester CCG', xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients',
+                                  filename='Prescription_outliers_in_Manchester_CCG', scatter_x=outlier_practice['date'], scatter_y=outlier_practice['items_per_1000'], hue=outlier_practice.row_name, data=outlier_practice)
 
     # Create a heatmap---------------------------------------------------------------------------------------------------------------------------------------------------------------
-    heatmap(df = prescribing_df, index = 'rew_name', columns = 'date', values = 'items_per_1000', title = 'Antibiotics prescribed per 1000 patients in Manchester CCG by practice', filename = "Heatmap")
+    heatmap_graph = heatmap(df=prescribing_df, index='row_name', columns='date', values='items_per_1000',
+                    title='Antibiotics prescribed per 1000 patients in Manchester CCG by practice', filename='heatmap')
 
     # Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    # move boxplot up to function
+    # move all outliers up to functions and try to condense
+    # move normalisation, mean and std calculations up to functions
 
     # Add tests
     # make an output saying graph plotted successfully after each graph
