@@ -1,4 +1,4 @@
-# prescribing
+# Analysis of antibiotic prescription data for Manchester CCG (Clinical Commissioning Group)
 
 
 ## Installation
