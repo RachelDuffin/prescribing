@@ -50,22 +50,22 @@ python3 prescription_script.py
 This will create a set of six graphical outputs, which can be found in the graphs directory.
 
 ### Antibiotics prescribed in Manchester CCG:
-![](graphs%20antibiotics_prescribed_in_Manchester_over_time.png)
+![](graphs/figure%20antibiotics_prescribed_in_Manchester_over_time.png)
 
 ### Normalised antibotics prescribed in Manchester CCG:
-![](graphs%20normalised_antibiotics_prescribed_in_manchester_over_time.png)
+![](graphs/figure%20normalised_antibiotics_prescribed_in_manchester_over_time.png)
 
 ### Mean, max, min and standard deviation plot:
-![](graphs%20Mean_and_sd_antibiotics_per_1000_patients.png)
+![](graphs/figure%20Mean_and_sd_antibiotics_per_1000_patients.png)
 
 ### Outliers for antibiotic prescriptions in Manchester CCG:
-![](graphs%20Prescription_outliers_in_Manchester_CCG.png)
+![](graphs/figure%20Prescription_outliers_in_Manchester_CCG.png)
 
 ### Box plot of antibiotics prescribed in Manchester CCG:
-![](graphs%20Box_plot.png)
+![](graphs/figure%20Box_plot.png)
 
 ### Heatmap of antibotics prescribed in Manchester CCG:
-![](graphs%20heatmap.png)
+![](graphs/figure%20heatmap.png)
 
 
 
