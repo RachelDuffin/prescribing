@@ -14,7 +14,7 @@ Check python3 is installed:
 ```
 which python3
 ```
-If not, install python3:
+If not installed, install python3:
 ```
 sudo apt-get install python3
 ```
@@ -22,7 +22,7 @@ Check pip3 is installed:
 ```
 which pip3
 ```
-If not, install pip3:
+If not installed, install pip3:
 ```
 sudo apt-get install python3-pip
 ```
@@ -47,7 +47,11 @@ To run the python script, run:
 ```
 python3 prescription_script.py
 ```
-This will create a set of six graphical outputs, which can be found in the graphs directory.
+The script will attempt to acquire two sets of data for GP practices in Manchester Clinical Commissioning Group (CCG) using two API keys provided by openprescribing.net. These sets of data are: 
+*The number of antibiotic prescription events per GP practice per month. 
+*The number of patients registered at each GP practice per month.
+
+The script will then produce a set of six graphical outputs to display this data in a way that can be more easily interpreted by the user. 
 
 ### Antibiotics prescribed in Manchester CCG
 ![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/antibiotics_prescribed_in_Manchester_over_time.png)
@@ -72,6 +76,3 @@ The boxplot above was created from the antibiotics prescribed per 1000 registere
 ### Heatmap of antibotics prescribed in Manchester CCG:
 ![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/heatmap.png)
 The key is indicated on the right, with number of prescriptions per 1000 registered patients for each month at each GP practice in Manchester indicated by the key on the right (high number of prescriptions are displayed in red, and low in blue). This provides an easy visual summary of which practices and which months contain the highest and lowest number of prescriptions. 
-
-
-
