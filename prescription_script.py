@@ -6,17 +6,27 @@
 import requests
 import csv
 import json
+import os
+import shutil
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 
+
 # DEFINE FUNCTIONS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# create directory for graphical outputs
+def create_directory(graphs):
+    if os.path.exists(graphs):
+        shutil.rmtree(graphs)  # removes directory if already exists
+    os.makedirs(graphs)  # creates directory
 
 # DATA CALCULATION FUNCTIONS
 
 # Create dataframe from API data
+
+
 def get_api_data(api):
     try:
         return pd.DataFrame.from_dict(requests.get(api).json())
@@ -126,8 +136,8 @@ def line_plot(x, y, title, xlabel, ylabel, filename, prescribing_df):
         ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key)
     # legend has two columns, and sits outside the plot
     ax.legend(bbox_to_anchor=(1.01, 1.05), ncol=2)
-    # save figure as png with specified name
-    return plt.close(fig.savefig('{}.png'.format(filename), format='png', dpi=200))
+    # saves .png to graphs folder
+    return plt.close(fig.savefig('graphs/{}.png'.format(filename), format='png', dpi=200))
 
 
 # Standard deviation plot
@@ -140,11 +150,12 @@ def mean_stdev_plot(x, y, title, xlabel, ylabel, filename, min, max, std, legend
     ax.plot(x, min, label='Minimum')  # plots minimum value for each month
     ax.plot(x, max, label='Maximum')  # plots maximum value for each month
     ax.legend(title=legendtitle)  # creates legend with specified title
-    # save figure as png with specified name
-    return plt.close(fig.savefig('{}.png'.format(filename), format='png', dpi=200))
-
+    # saves .png to graphs folder
+    return plt.close(fig.savefig('graphs/{}.png'.format(filename), format='png', dpi=200))
 
 # Scatter plot on mean line plot
+
+
 def scatter_plot(x, y, title, xlabel, ylabel, filename, scatter_x, scatter_y, hue, data):
     global ax
     plot_layout(xlabel, ylabel, title)
@@ -152,17 +163,16 @@ def scatter_plot(x, y, title, xlabel, ylabel, filename, scatter_x, scatter_y, hu
     # plots outlier data as scatter graph (each practice is a different colour)
     ax = sns.scatterplot(x=scatter_x, y=scatter_y,
                          hue=hue, data=data, legend='full')
-    # save figure as png with specified name
-    return plt.close(fig.savefig('{}.png'.format(filename), format='png', dpi=200))
+    # saves .png to graphs folder
+    return plt.close(fig.savefig('graphs/{}.png'.format(filename), format='png', dpi=200))
 
 
 # Boxplot function using seaborn
 def box_plot(x, y, xlabel, ylabel, title, filename):
     plot_layout(xlabel, ylabel, title)
     fig = sns.boxplot(x, y)  # plots boxplot from specified x and y values
-    # saves figure as png with specified filename
-    return fig.figure.savefig('{}.png'.format(filename), format='png',
-                              dpi=200)
+    return fig.figure.savefig('graphs/{}.png'.format(filename), format='png',
+                              dpi=200)  # saves .png to graphs folder
 
 
 # plots a heatmap where low prescribing is blue and high prescribing is red, robust sets contrast levels based on quantiles
@@ -173,14 +183,17 @@ def heatmap(df, index, columns, values, xlabel, ylabel, title, filename):
     plot = sns.heatmap(data_by_practice, cmap='coolwarm',
                        robust=True)  # plots the heatmap
     fig = plot.get_figure()
-    return fig.savefig('{}.png'.format(filename), format='png',
-                       dpi=200)  # plots and saves figure
+    return fig.savefig('graphs/{}.png'.format(filename), format='png',
+                       dpi=200)  # saves .png to graphs folder
 
 
 # Main method ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 def main():
+    # create directory for graphical outputs
+    create_directory('graphs')
+
     # Set graph text sizes
     text_size(SMALL_SIZE=10, MEDIUM_SIZE=14, BIGGER_SIZE=18)
 
@@ -200,8 +213,8 @@ def main():
         'date')['items_per_1000'].describe().reset_index()
 
     # Caclulate outliers using outlier function
-    outlier_df = add_dates_to_outliers(unique_dates=prescribing_df['date'].unique(
-    ), column_names=['date', 'items_per_1000'], prescribing_df=prescribing_df)
+    outlier_df = add_dates_to_outliers(unique_dates=prescribing_df['date'].unique(),
+                                       column_names=['date', 'items_per_1000'], prescribing_df=prescribing_df)
 
     # Merge outliers with the original dataframe
     outlier_practice = outlier_merge(
