@@ -2,7 +2,7 @@
 
 # pip3 install requests pandas matplotlib seaborn
 
-# Import required packages---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Import required packages---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 import requests
 import csv
 import json
@@ -12,9 +12,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
+import tkinter as tk
 
 
-# DEFINE FUNCTIONS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# DEFINE FUNCTIONS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Create directory for graphical outputs
 def create_directory(graphs):
@@ -128,8 +129,8 @@ def plot_layout(xlabel, ylabel, title):
 
 
 # Line plots
-def line_plot(x, y, title, xlabel, ylabel, filename, prescribing_df):
-    return print("Plotting line plot...")
+def line_plot(x, y, title, xlabel, ylabel, dir_name, filename, prescribing_df):
+    print("Plotting line plot...")
     global ax
     plot_layout(xlabel, ylabel, title)
     for key, grp in prescribing_df.groupby(['row_name']):
@@ -137,13 +138,15 @@ def line_plot(x, y, title, xlabel, ylabel, filename, prescribing_df):
         ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key)
     # legend has two columns, and sits outside the plot
     ax.legend(bbox_to_anchor=(1.01, 1.05), ncol=2)
-    # saves .png to graphs folder
-    return plt.close(fig.savefig('graphs/{}.png'.format(filename), format='png', dpi=200))
+    # specify the path for the .png output
+    path = dir_name + '/' + filename
+    # saves .png to specified folder
+    return plt.close(fig.savefig(path, format='png', dpi=200))
 
 
 # Standard deviation plot
-def mean_stdev_plot(x, y, title, xlabel, ylabel, filename, min, max, std, legendtitle):
-    return print("Plotting standard deviation plot...")
+def mean_stdev_plot(x, y, title, xlabel, ylabel, dir_name, filename, min, max, std, legendtitle):
+    print("Plotting standard deviation plot...")
     plot_layout(xlabel, ylabel, title)
     ax.plot(x, y, label='Mean')  # plots mean line
     # shades ± one standard deviation of mean in grey
@@ -152,79 +155,71 @@ def mean_stdev_plot(x, y, title, xlabel, ylabel, filename, min, max, std, legend
     ax.plot(x, min, label='Minimum')  # plots minimum value for each month
     ax.plot(x, max, label='Maximum')  # plots maximum value for each month
     ax.legend(title=legendtitle)  # creates legend with specified title
-    # saves .png to graphs folder
-    return plt.close(fig.savefig('graphs/{}.png'.format(filename), format='png', dpi=200))
+    # specify the path for the .png output
+    path = dir_name + '/' + filename
+    # saves .png to specified folder
+    return plt.close(fig.savefig(path, format='png', dpi=200))
 
 
 # Scatter plot on mean line plot
-def scatter_plot(x, y, title, xlabel, ylabel, filename, scatter_x, scatter_y, hue, data):
-    return print("Plotting scatter plot...")
+def scatter_plot(x, y, title, xlabel, ylabel, dir_name, filename, scatter_x, scatter_y, hue, data):
+    print("Plotting scatter plot...")
     global ax
     plot_layout(xlabel, ylabel, title)
     ax.plot(x, y, label='Mean')  # plots mean line
     # plots outlier data as scatter graph (each practice is a different colour)
     ax = sns.scatterplot(x=scatter_x, y=scatter_y,
                          hue=hue, data=data, legend='full')
-    # saves .png to graphs folder
-    return plt.close(fig.savefig('graphs/{}.png'.format(filename), format='png', dpi=200))
+    # specify the path for the .png output
+    path = dir_name + '/' + filename
+    # saves .png to specified folder
+    return plt.close(fig.savefig(path, format='png', dpi=200))
 
 
 # Boxplot function using seaborn
-def box_plot(x, y, xlabel, ylabel, title, filename):
-    return print("Plotting boxplot...")
+def box_plot(x, y, xlabel, ylabel, title, dir_name, filename):
+    print("Plotting boxplot...")
     plot_layout(xlabel, ylabel, title)
     fig = sns.boxplot(x, y)  # plots boxplot from specified x and y values
-    return fig.figure.savefig('graphs/{}.png'.format(filename), format='png',
-                              dpi=200)  # saves .png to graphs folder
+    # specify the path for the .png output
+    path = dir_name + '/' + filename
+    return fig.figure.savefig(path, format='png',
+                              dpi=200)  # saves .png to specified folder
 
 
 # Plots a heatmap where low prescribing is blue and high prescribing is red, robust sets contrast levels based on quantiles
-def heatmap(df, index, columns, values, xlabel, ylabel, title, filename):
-    return print("Plotting heatmap...")
+def heatmap(df, index, columns, values, xlabel, ylabel, title, dir_name, filename):
+    print("Plotting heatmap...")
     # pivots data frame so that it gives items per 1000 by practice over time
     data_by_practice = df.pivot(index, columns, values)
     plot_layout(xlabel, ylabel, title)
     plot = sns.heatmap(data_by_practice, cmap='coolwarm',
                        robust=True)  # plots the heatmap
     fig = plot.get_figure()
-    return fig.savefig('graphs/{}.png'.format(filename), format='png',
-                       dpi=200)  # saves .png to graphs folder
+    # specify the path for the .png output
+    path = dir_name + '/' + filename
+    return fig.savefig(path, format='png',
+                       dpi=200)  # saves .png to specified folder
 
 
 # TEST FUNCTIONS
 
-# Checks the dataframe exists
-def test_dataframe_existance(df, df_name, error):
-    if df is None:
-        msg = "dataframe does not exist"
-        return df_name + msg
-
-
-# Checks the dataframe is in pandas format
-def test_dataframe_format(df, df_name, error):
-    if isinstance(df, pd.DataFrame):
-        msg = "dataframe format is incorrect"
-        return error + df_name + msg
-
-
-# Check the dataframe is not empty
-def test_is_dataframe_empty(df, df_name, error):
-    if df.empty:
-        msg = "dataframe is empty"
-        return error + df_name + msg
-
-
 # Checks format of dataframe using above three functions
-def test_correct_dataframe(df, df_name):
+def test_correct_dataframe(df, df_name, error):
     if df is not None and isinstance(df, pd.DataFrame) and not df.empty:
         msg = "dataframe exists, is a pandas dataframe and is not empty."
         string = df_name + msg
         print(string)
     else:
-        error = 'Error: '
-        print(test_dataframe_existance(df, df_name, error))
-        print(test_dataframe_format(df, df_name, error))
-        print(test_is_dataframe_empty(df, df_name, error))
+        if df.empty:
+            msg = "dataframe is empty"
+            return error + df_name + msg
+        if isinstance(df, pd.DataFrame):
+            msg = "dataframe format is incorrect"
+            return error + df_name + msg
+        if df is None:
+            msg = "dataframe does not exist"
+            return df_name + msg
 
 
 # Checks correct column names are present
@@ -234,12 +229,13 @@ def test_colnames(df, colnames):
     else:
         print("     >Error: expected column names not present.")
 
-# Main method ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# Main method ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def main():
-    # Create directory for graphical outputs
-    create_directory('graphs')
+    # Specify global directory for saving graphs
+    dirname = tk.filedialog.askdirectory(
+        title="Choose save location for graphs:")
 
     # Set graph text sizes
     text_size(SMALL_SIZE=10, MEDIUM_SIZE=14, BIGGER_SIZE=18)
@@ -252,87 +248,84 @@ def main():
                               "Total-list-size-14L.csv"
                               )
     # test dataframe looks correct
-    test_correct_dataframe(prescribing_df, 'Original ')
-    #test expected columns are present
-    test_colnames(prescribing_df, ['date', 'row_id', 'row_name', 'total_list_size'])
+    test_correct_dataframe(prescribing_df, 'Original ', "Error: ")
+    # test expected columns are present
+    test_colnames(prescribing_df, [
+                  'date', 'row_id', 'row_name', 'total_list_size'])
 
     # Calculate prescribed items per 1000 patients at each practice
     # Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
     prescribing_df['items_per_1000'] = prescribing_df['items'] / \
         prescribing_df['total_list_size']*1000
     # test dataframe looks correct
-    test_correct_dataframe(prescribing_df, 'Original (with added normalisation data) ')
-    #test expected columns are present
-    test_colnames(prescribing_df, ['date', 'row_id', 'row_name', 'total_list_size', 'items_per_1000'])
-    
+    test_correct_dataframe(
+        prescribing_df, 'Original (with added normalisation data) ',  "Error: ")
+    # test expected columns are present
+    test_colnames(prescribing_df, [
+                  'date', 'row_id', 'row_name', 'total_list_size', 'items_per_1000'])
+
     # calculate mean and standard deviation across all practices per month
     # Calculates mean and standard deviation across all practices for each month per 1000 registered patients
     prescribe_stats = prescribing_df.groupby(
         'date')['items_per_1000'].describe().reset_index()
     # test dataframe looks correct
-    test_correct_dataframe(prescribe_stats, 'Statistical ')
-    #test expected columns are present
-    test_colnames(prescribe_stats, ['date', 'count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'])
+    test_correct_dataframe(prescribe_stats, 'Statistical ',  "Error: ")
+    # test expected columns are present
+    test_colnames(prescribe_stats, [
+                  'date', 'count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'])
 
     # Caclulate outliers using outlier function
     outlier_df = add_dates_to_outliers(unique_dates=prescribing_df['date'].unique(),
                                        column_names=['date', 'items_per_1000'], prescribing_df=prescribing_df)
     # test dataframe looks correct
-    test_correct_dataframe(outlier_df, 'Outliers ')
-    #test expected columns are present
+    test_correct_dataframe(outlier_df, 'Outliers ',  "Error: ")
+    # test expected columns are present
     test_colnames(outlier_df, ['date', 'items_per_1000'])
 
     # Merge outliers with the original dataframe
     outlier_practice = outlier_merge(
         outlier_df=outlier_df, original_df=prescribing_df, columns=['date', 'items_per_1000'])
     # test dataframe looks correct
-    test_correct_dataframe(outlier_practice, 'Merged outliers ')
-    #test expected columns are present
+    test_correct_dataframe(outlier_practice, 'Merged outliers ',  "Error: ")
+    # test expected columns are present
     test_colnames(outlier_practice, ['date', 'items_per_1000'])
 
-    # Plot graphs of prescribed items over time for each practice in Manchester CCG (using defined functions)-------------------------------------------------------------------------------------------------
+    # Plot graphs of prescribed items over time for each practice in Manchester CCG (using defined functions)----------------------------------------------------------------------------------------------------
 
     # Plot graph of antibiotics prescribed by GP practices in Manchester over time
-    line_plot(x='date', y='items', title="Antibiotics prescribed by GP practices in Manchester CCG over time", filename="antibiotics_prescribed_in_Manchester_over_time",
+    line_plot(x='date', y='items', title="Antibiotics prescribed by GP practices in Manchester CCG over time", dir_name=dirname, filename="antibiotics_prescribed_in_Manchester_over_time.png",
               xlabel="Date", ylabel="Number of antibiotics prescribed", prescribing_df=prescribing_df)  # plot basic graph showing number of antibiotics prescribed by each practice each month over time
 
     # Plot graph of normalised antibiotics prescribed by GP practices in Manchester over time
-    line_plot(x='date', y='items_per_1000', title="Graph of antibiotics prescribed per 1000 patients by GP practices in Manchester CCG over time", filename="normalised_antibiotics_prescribed_in_manchester_over_time",
+    line_plot(x='date', y='items_per_1000', title="Graph of antibiotics prescribed per 1000 patients by GP practices in Manchester CCG over time", dir_name=dirname, filename="normalised_antibiotics_prescribed_in_manchester_over_time.png",
               xlabel="Date", ylabel="Number of antibiotics prescribed", prescribing_df=prescribing_df)  # plots normalised graph accounting for patient population size (prescribed items per 1,000 registered patients)
 
-    # Plot graphs of mean for whole Manchester CCG------------------------------------------------------------------------------------------------------------------------------------------------------------
+    # Plot graphs of mean for whole Manchester CCG---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    # Plot graph of mean +- 1 standard deviation for Manchester CCG-------------------------------------------------------------------------------------------------------------------------------------------
+    # Plot graph of mean +- 1 standard deviation for Manchester CCG----------------------------------------------------------------------------------------------------------------------------------------------
     mean_stdev_plot(x=prescribe_stats['date'], y=prescribe_stats['mean'], title='Mean ± one standard deviation of antibiotics prescribed per 1000 patients for GP practices in Manchester CCG', xlabel="Date",
-                    ylabel="Antibiotics prescribed per 1000 patients", min=prescribe_stats['min'], max=prescribe_stats['max'], std=prescribe_stats['std'], filename="Mean_and_sd_antibiotics_per_1000_patients", legendtitle="Antibiotics prescribed per 1000 people")
+                    ylabel="Antibiotics prescribed per 1000 patients", min=prescribe_stats['min'], max=prescribe_stats['max'], std=prescribe_stats['std'], dir_name=dirname, filename="Mean_and_sd_antibiotics_per_1000_patients.png", legendtitle="Antibiotics prescribed per 1000 people")
 
-    # Plot graph of mean with outliers------------------------------------------------------------------------------------------------------------------------------------------------------------
+    # Plot graph of mean with outliers---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    scatter_plot(x=prescribe_stats['date'], y=prescribe_stats['mean'], title='Prescription outliers in Manchester CCG', xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients',
-                 filename='Prescription_outliers_in_Manchester_CCG', scatter_x=outlier_practice['date'], scatter_y=outlier_practice['items_per_1000'], hue=outlier_practice.row_name, data=outlier_practice)
+    scatter_plot(x=prescribe_stats['date'], y=prescribe_stats['mean'], title='Prescription outliers in Manchester CCG', xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients', dir_name=dirname,
+                 filename='Prescription_outliers_in_Manchester_CCG.png', scatter_x=outlier_practice['date'], scatter_y=outlier_practice['items_per_1000'], hue=outlier_practice.row_name, data=outlier_practice)
 
-    # Plot boxplot showing spread of data within each month-----------------------------------------------------------------------------------------------------------------------------
+    # Plot boxplot showing spread of data within each month------------------------------------------------------------------------------------------------------------------------------------------------------
     # use seaborn to plot boxplot of month vs antibiotics prescribed per 1000 patients
     box_plot(x=prescribing_df['date'], y=prescribing_df['items_per_1000'], xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients',
-             title='Boxplot showing antibiotics prescribed per 1000 patients in Manchester CCG per month', filename="Box_plot")
+             title='Boxplot showing antibiotics prescribed per 1000 patients in Manchester CCG per month', dir_name=dirname, filename="Box_plot.png")
 
-    # Create a heatmap---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    # Create a heatmap-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     heatmap(df=prescribing_df, index='row_name', columns='date', values='items_per_1000', xlabel='Date', ylabel='GP Practice in Manchester',
-            title='Antibiotics prescribed per 1000 patients in Manchester CCG by practice', filename='heatmap')
+            title='Antibiotics prescribed per 1000 patients in Manchester CCG by practice', dir_name=dirname, filename='Heatmap.png')
 
-    # Notes - still to do-----------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    # Add tests
-    # make an output saying graph plotted successfully after each graph
-    # make output saying 'table is the expected size'
-
-# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 if __name__ == "__main__":
     print("Starting analysis")
     main()
-    print("Finishing analysis, graphs saved as png files")
+    print("Analysis complete: graphs saved as png files")
 
-
-# notes
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
