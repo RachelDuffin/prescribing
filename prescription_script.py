@@ -43,13 +43,13 @@ def get_csv_data(csv):
 
 
 # Download and merge prescribing data
-def download(spendingAPI, listsizeAPI):  # specifies inputs for defined function
+def download(spendingAPI, listsizeAPI, size_csv, prescribing_csv):  # specifies inputs for defined function
     prescribe_data = get_api_data(spendingAPI)
     size_data = get_api_data(listsizeAPI)
 
     if prescribe_data is None:
         print("Prescriptions data could not be downloaded from APIs, trying csv files")
-        prescribe_data = get_csv_data("spending-by-practice-0501.csv")
+        prescribe_data = get_csv_data(prescribing_csv)
         if prescribe_data is None:
             print("Prescriptions data could not be obtained from CSVs")
         if size_data is not None:
@@ -59,7 +59,7 @@ def download(spendingAPI, listsizeAPI):  # specifies inputs for defined function
 
     if size_data is None:
         print("Patient numbers data could not be downloaded from APIs, trying csv files")
-        size_data = get_csv_data("Total-list-size-14L.csv")
+        size_data = get_csv_data(size_csv)
         if size_data is None:
             print("Patient numbers data could not be obtained from CSV")
         if size_data is not None:
@@ -200,7 +200,10 @@ def main():
     # Download data from APIs
     prescribing_df = download(spendingAPI='https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L',  # API for number of antibiotics prescribed by practice in Manchester CCG
                               # API for number of patients by practice in Manchester CCG
-                              listsizeAPI='https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size')
+                                listsizeAPI='https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size',
+                                prescribing_csv = "spending-by-practice-0501.csv",
+                                size_csv = "Total-list-size-14L.csv"
+                                )
 
     # Calculate prescribed items per 1000 patients at each practice
     # Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
