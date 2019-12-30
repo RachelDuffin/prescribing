@@ -33,8 +33,9 @@ def get_api_data(api):
     except:
         print("Could not download from API")
 
-
 # Create dataframe from CSV data
+
+
 def get_csv_data(csv):
     try:
         return pd.read_csv(csv)
@@ -43,7 +44,8 @@ def get_csv_data(csv):
 
 
 # Download and merge prescribing data
-def download(spendingAPI, listsizeAPI, size_csv, prescribing_csv):  # specifies inputs for defined function
+# specifies inputs for defined function
+def download(spendingAPI, listsizeAPI, size_csv, prescribing_csv):
     prescribe_data = get_api_data(spendingAPI)
     size_data = get_api_data(listsizeAPI)
 
@@ -52,7 +54,7 @@ def download(spendingAPI, listsizeAPI, size_csv, prescribing_csv):  # specifies 
         prescribe_data = get_csv_data(prescribing_csv)
         if prescribe_data is None:
             print("Prescriptions data could not be obtained from CSVs")
-        if size_data is not None:
+        if prescribe_data is not None:
             print("Prescriptions data was obtained from CSV")
     else:
         print("Prescriptions data obtained from APIs")
@@ -68,7 +70,7 @@ def download(spendingAPI, listsizeAPI, size_csv, prescribing_csv):  # specifies 
         print("Patient numbers data obtained from APIs")
 
     if size_data is not None and prescribe_data is not None:
-        return pd.merge(prescribe_data, size_data, on=['row_id', 'date', 'row_name'])
+        return pd.merge(prescribe_data[['date', 'items', 'row_id', 'row_name']], size_data, on=['row_id', 'date', 'row_name'])
 
 
 # Calculate outliers using interquartile range
@@ -187,6 +189,44 @@ def heatmap(df, index, columns, values, xlabel, ylabel, title, filename):
                        dpi=200)  # saves .png to graphs folder
 
 
+# TEST FUNCTIONS
+
+# Checks the dataframe exists
+def does_it_exist(df, df_name):
+    if df is None:
+        msg = "dataframe does not exist"
+        return df_name + msg
+
+# Checks the dataframe is in pandas format
+
+
+def format_dataframe(df, df_name):
+    if isinstance(df, pd.DataFrame):
+        msg = "dataframe format is incorrect"
+        return df_name + msg
+
+# check the dataframe is not empty
+
+
+def is_dataframe_empty(df, df_name):
+    if df.empty:
+        msg = "dataframe is empty"
+        return df_name + S
+
+# Checks format of dataframe using above three functions
+
+
+def correct_dataframe(df, df_name):
+    if df is not None and isinstance(df, pd.DataFrame) and not df.empty:
+        msg = "dataframe exists, is a pandas dataframe and is not empty."
+        string = df_name + msg
+        print(string)
+    else:
+        print(does_it_exist(df, df_name))
+        print(format_dataframe(df, df_name))
+        print(is_dataframe_empty(df, df_name))
+
+
 # Main method ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -200,28 +240,41 @@ def main():
     # Download data from APIs
     prescribing_df = download(spendingAPI='https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L',  # API for number of antibiotics prescribed by practice in Manchester CCG
                               # API for number of patients by practice in Manchester CCG
-                                listsizeAPI='https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size',
-                                prescribing_csv = "spending-by-practice-0501.csv",
-                                size_csv = "Total-list-size-14L.csv"
-                                )
+                              listsizeAPI='https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size',
+                              prescribing_csv="spending-by-practice-0501.csv",
+                              size_csv="Total-list-size-14L.csv"
+                              )
+    # test dataframe looks correct
+    correct_dataframe(prescribing_df, 'Original ')
 
     # Calculate prescribed items per 1000 patients at each practice
     # Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
     prescribing_df['items_per_1000'] = prescribing_df['items'] / \
         prescribing_df['total_list_size']*1000
 
+    # test dataframe looks correct
+    correct_dataframe(prescribing_df, 'Original (with added normalisation data) ')
+
     # calculate mean and standard deviation across all practices per month
     # Calculates mean and standard deviation across all practices for each month per 1000 registered patients
-    prescribe_desc = prescribing_df.groupby(
+    prescribe_stats = prescribing_df.groupby(
         'date')['items_per_1000'].describe().reset_index()
+
+    # test dataframe looks correct
+    correct_dataframe(prescribe_stats, 'Statistical ')
 
     # Caclulate outliers using outlier function
     outlier_df = add_dates_to_outliers(unique_dates=prescribing_df['date'].unique(),
                                        column_names=['date', 'items_per_1000'], prescribing_df=prescribing_df)
+    # test dataframe looks correct
+    correct_dataframe(outlier_df, 'Outliers ')
 
     # Merge outliers with the original dataframe
     outlier_practice = outlier_merge(
         outlier_df=outlier_df, original_df=prescribing_df, columns=['date', 'items_per_1000'])
+
+    # test dataframe looks correct
+    correct_dataframe(outlier_df, 'Merged outliers ')
 
     # Plot graphs of prescribed items over time for each practice in Manchester CCG (using defined functions)-------------------------------------------------------------------------------------------------
 
@@ -236,12 +289,12 @@ def main():
     # Plot graphs of mean for whole Manchester CCG------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     # Plot graph of mean +- 1 standard deviation for Manchester CCG-------------------------------------------------------------------------------------------------------------------------------------------
-    mean_stdev_plot(x=prescribe_desc['date'], y=prescribe_desc['mean'], title='Mean ± one standard deviation of antibiotics prescribed per 1000 patients for GP practices in Manchester CCG', xlabel="Date",
-                    ylabel="Antibiotics prescribed per 1000 patients", min=prescribe_desc['min'], max=prescribe_desc['max'], std=prescribe_desc['std'], filename="Mean_and_sd_antibiotics_per_1000_patients", legendtitle="Antibiotics prescribed per 1000 people")
+    mean_stdev_plot(x=prescribe_stats['date'], y=prescribe_stats['mean'], title='Mean ± one standard deviation of antibiotics prescribed per 1000 patients for GP practices in Manchester CCG', xlabel="Date",
+                    ylabel="Antibiotics prescribed per 1000 patients", min=prescribe_stats['min'], max=prescribe_stats['max'], std=prescribe_stats['std'], filename="Mean_and_sd_antibiotics_per_1000_patients", legendtitle="Antibiotics prescribed per 1000 people")
 
     # Plot graph of mean with outliers------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    scatter_plot(x=prescribe_desc['date'], y=prescribe_desc['mean'], title='Prescription outliers in Manchester CCG', xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients',
+    scatter_plot(x=prescribe_stats['date'], y=prescribe_stats['mean'], title='Prescription outliers in Manchester CCG', xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients',
                  filename='Prescription_outliers_in_Manchester_CCG', scatter_x=outlier_practice['date'], scatter_y=outlier_practice['items_per_1000'], hue=outlier_practice.row_name, data=outlier_practice)
 
     # Plot boxplot showing spread of data within each month-----------------------------------------------------------------------------------------------------------------------------
@@ -266,3 +319,6 @@ if __name__ == "__main__":
     print("Starting analysis")
     main()
     print("Finishing analysis, graphs saved as png files")
+
+
+# notes
