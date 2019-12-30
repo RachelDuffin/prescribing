@@ -16,26 +16,24 @@ from pathlib import Path
 
 # DEFINE FUNCTIONS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# create directory for graphical outputs
+# Create directory for graphical outputs
 def create_directory(graphs):
     if os.path.exists(graphs):
         shutil.rmtree(graphs)  # removes directory if already exists
     os.makedirs(graphs)  # creates directory
 
+
 # DATA CALCULATION FUNCTIONS
 
 # Create dataframe from API data
-
-
 def get_api_data(api):
     try:
         return pd.DataFrame.from_dict(requests.get(api).json())
     except:
         print("Could not download from API")
 
+
 # Create dataframe from CSV data
-
-
 def get_csv_data(csv):
     try:
         return pd.read_csv(csv)
@@ -44,7 +42,7 @@ def get_csv_data(csv):
 
 
 # Download and merge prescribing data
-# specifies inputs for defined function
+# Specifies inputs for defined function
 def download(spendingAPI, listsizeAPI, size_csv, prescribing_csv):
     prescribe_data = get_api_data(spendingAPI)
     size_data = get_api_data(listsizeAPI)
@@ -87,7 +85,7 @@ def calculate_outliers_iqr_method(values):
     return outliers  # returns a list of outlier values
 
 
-# create new dataframe with outliers and corresponding dates
+# Create new dataframe with outliers and corresponding dates
 def add_dates_to_outliers(unique_dates, column_names, prescribing_df):
     outlier_list = []  # creates an empty list for outliers to be appended to
     for date in unique_dates:  # from a list of unique date values in prescribig_df
@@ -131,6 +129,7 @@ def plot_layout(xlabel, ylabel, title):
 
 # Line plots
 def line_plot(x, y, title, xlabel, ylabel, filename, prescribing_df):
+    return print("Plotting line plot...")
     global ax
     plot_layout(xlabel, ylabel, title)
     for key, grp in prescribing_df.groupby(['row_name']):
@@ -144,6 +143,7 @@ def line_plot(x, y, title, xlabel, ylabel, filename, prescribing_df):
 
 # Standard deviation plot
 def mean_stdev_plot(x, y, title, xlabel, ylabel, filename, min, max, std, legendtitle):
+    return print("Plotting standard deviation plot...")
     plot_layout(xlabel, ylabel, title)
     ax.plot(x, y, label='Mean')  # plots mean line
     # shades ± one standard deviation of mean in grey
@@ -155,10 +155,10 @@ def mean_stdev_plot(x, y, title, xlabel, ylabel, filename, min, max, std, legend
     # saves .png to graphs folder
     return plt.close(fig.savefig('graphs/{}.png'.format(filename), format='png', dpi=200))
 
+
 # Scatter plot on mean line plot
-
-
 def scatter_plot(x, y, title, xlabel, ylabel, filename, scatter_x, scatter_y, hue, data):
+    return print("Plotting scatter plot...")
     global ax
     plot_layout(xlabel, ylabel, title)
     ax.plot(x, y, label='Mean')  # plots mean line
@@ -171,14 +171,16 @@ def scatter_plot(x, y, title, xlabel, ylabel, filename, scatter_x, scatter_y, hu
 
 # Boxplot function using seaborn
 def box_plot(x, y, xlabel, ylabel, title, filename):
+    return print("Plotting boxplot...")
     plot_layout(xlabel, ylabel, title)
     fig = sns.boxplot(x, y)  # plots boxplot from specified x and y values
     return fig.figure.savefig('graphs/{}.png'.format(filename), format='png',
                               dpi=200)  # saves .png to graphs folder
 
 
-# plots a heatmap where low prescribing is blue and high prescribing is red, robust sets contrast levels based on quantiles
+# Plots a heatmap where low prescribing is blue and high prescribing is red, robust sets contrast levels based on quantiles
 def heatmap(df, index, columns, values, xlabel, ylabel, title, filename):
+    return print("Plotting heatmap...")
     # pivots data frame so that it gives items per 1000 by practice over time
     data_by_practice = df.pivot(index, columns, values)
     plot_layout(xlabel, ylabel, title)
@@ -192,89 +194,101 @@ def heatmap(df, index, columns, values, xlabel, ylabel, title, filename):
 # TEST FUNCTIONS
 
 # Checks the dataframe exists
-def does_it_exist(df, df_name):
+def test_dataframe_existance(df, df_name, error):
     if df is None:
         msg = "dataframe does not exist"
         return df_name + msg
 
+
 # Checks the dataframe is in pandas format
-
-
-def format_dataframe(df, df_name):
+def test_dataframe_format(df, df_name, error):
     if isinstance(df, pd.DataFrame):
         msg = "dataframe format is incorrect"
-        return df_name + msg
-
-# check the dataframe is not empty
+        return error + df_name + msg
 
 
-def is_dataframe_empty(df, df_name):
+# Check the dataframe is not empty
+def test_is_dataframe_empty(df, df_name, error):
     if df.empty:
         msg = "dataframe is empty"
-        return df_name + S
+        return error + df_name + msg
+
 
 # Checks format of dataframe using above three functions
-
-
-def correct_dataframe(df, df_name):
+def test_correct_dataframe(df, df_name):
     if df is not None and isinstance(df, pd.DataFrame) and not df.empty:
         msg = "dataframe exists, is a pandas dataframe and is not empty."
         string = df_name + msg
         print(string)
     else:
-        print(does_it_exist(df, df_name))
-        print(format_dataframe(df, df_name))
-        print(is_dataframe_empty(df, df_name))
+        error = 'Error: '
+        print(test_dataframe_existance(df, df_name, error))
+        print(test_dataframe_format(df, df_name, error))
+        print(test_is_dataframe_empty(df, df_name, error))
 
+
+# Checks correct column names are present
+def test_colnames(df, colnames):
+    if set(colnames).issubset(df.columns):
+        print("     >Expected column names present.")
+    else:
+        print("     >Error: expected column names not present.")
 
 # Main method ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 def main():
-    # create directory for graphical outputs
+    # Create directory for graphical outputs
     create_directory('graphs')
 
     # Set graph text sizes
     text_size(SMALL_SIZE=10, MEDIUM_SIZE=14, BIGGER_SIZE=18)
 
     # Download data from APIs
-    prescribing_df = download(spendingAPI='https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L',  # API for number of antibiotics prescribed by practice in Manchester CCG
+    prescribing_df = download('https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L',  # API for number of antibiotics prescribed by practice in Manchester CCG
                               # API for number of patients by practice in Manchester CCG
-                              listsizeAPI='https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size',
-                              prescribing_csv="spending-by-practice-0501.csv",
-                              size_csv="Total-list-size-14L.csv"
+                              'https://openprescribing.net/api/1.0/org_details/?format=json&org_type=practice&org=14L&keys=total_list_size',
+                              "spending-by-practice-0501.csv",
+                              "Total-list-size-14L.csv"
                               )
     # test dataframe looks correct
-    correct_dataframe(prescribing_df, 'Original ')
+    test_correct_dataframe(prescribing_df, 'Original ')
+    #test expected columns are present
+    test_colnames(prescribing_df, ['date', 'row_id', 'row_name', 'total_list_size'])
 
     # Calculate prescribed items per 1000 patients at each practice
     # Adds column to dataframe of prescribed items per 1,000 registered patients as some practices are smaller than others
     prescribing_df['items_per_1000'] = prescribing_df['items'] / \
         prescribing_df['total_list_size']*1000
-
     # test dataframe looks correct
-    correct_dataframe(prescribing_df, 'Original (with added normalisation data) ')
-
+    test_correct_dataframe(prescribing_df, 'Original (with added normalisation data) ')
+    #test expected columns are present
+    test_colnames(prescribing_df, ['date', 'row_id', 'row_name', 'total_list_size', 'items_per_1000'])
+    
     # calculate mean and standard deviation across all practices per month
     # Calculates mean and standard deviation across all practices for each month per 1000 registered patients
     prescribe_stats = prescribing_df.groupby(
         'date')['items_per_1000'].describe().reset_index()
-
     # test dataframe looks correct
-    correct_dataframe(prescribe_stats, 'Statistical ')
+    test_correct_dataframe(prescribe_stats, 'Statistical ')
+    #test expected columns are present
+    test_colnames(prescribe_stats, ['date', 'count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'])
 
     # Caclulate outliers using outlier function
     outlier_df = add_dates_to_outliers(unique_dates=prescribing_df['date'].unique(),
                                        column_names=['date', 'items_per_1000'], prescribing_df=prescribing_df)
     # test dataframe looks correct
-    correct_dataframe(outlier_df, 'Outliers ')
+    test_correct_dataframe(outlier_df, 'Outliers ')
+    #test expected columns are present
+    test_colnames(outlier_df, ['date', 'items_per_1000'])
 
     # Merge outliers with the original dataframe
     outlier_practice = outlier_merge(
         outlier_df=outlier_df, original_df=prescribing_df, columns=['date', 'items_per_1000'])
-
     # test dataframe looks correct
-    correct_dataframe(outlier_df, 'Merged outliers ')
+    test_correct_dataframe(outlier_practice, 'Merged outliers ')
+    #test expected columns are present
+    test_colnames(outlier_practice, ['date', 'items_per_1000'])
 
     # Plot graphs of prescribed items over time for each practice in Manchester CCG (using defined functions)-------------------------------------------------------------------------------------------------
 
