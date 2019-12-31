@@ -109,19 +109,19 @@ def outlier_merge(outlier_df, original_df, columns):
 # GRAPH PLOTTING FUNCTIONS
 
 # Set text size for plots
-def text_size(SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE):
+def text_size(EXTRA_SMALL_SIZE, SMALL_SIZE, MEDIUM_SIZE, LARGE_SIZE):
     # fontsize of the axes title, and x and y labels
-    plt.rc('axes', titlesize=BIGGER_SIZE, labelsize=MEDIUM_SIZE)
-    plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
-    plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
-    plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
+    plt.rc('axes', titlesize=LARGE_SIZE, labelsize=MEDIUM_SIZE)
+    plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the x tick (x-value) labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the y tick (y-value) labels
+    plt.rc('legend', fontsize=EXTRA_SMALL_SIZE)  # legend fontsize
 
 
 # Set generic plot layout
 def plot_layout(xlabel, ylabel, title):
     global fig, ax
-    fig, ax = plt.subplots(figsize=(30, 10))  # Creates figure of specified
-    fig.suptitle(title)  # specifies graph title
+    fig, ax = plt.subplots(figsize=(30, 15))  # Creates figure of specified
+    plt.title(title)  # specifies graph title
     plt.xlabel(xlabel)  # specifies x-axis label
     plt.ylabel(ylabel)  # specifies y-axis label
     # rotates axis labels 90 degrees (makes them readable)
@@ -145,7 +145,7 @@ def line_plot(x, y, title, xlabel, ylabel, dir_name, filename, prescribing_df):
 
 
 # Standard deviation plot
-def mean_stdev_plot(x, y, title, xlabel, ylabel, dir_name, filename, min, max, std, legendtitle):
+def mean_stdev_plot(x, y, title, xlabel, ylabel, dir_name, filename, min, max, std):
     print("Plotting standard deviation plot...")
     plot_layout(xlabel, ylabel, title)
     ax.plot(x, y, label='Mean')  # plots mean line
@@ -154,7 +154,7 @@ def mean_stdev_plot(x, y, title, xlabel, ylabel, dir_name, filename, min, max, s
                      alpha=0.4, label='Standard deviation')
     ax.plot(x, min, label='Minimum')  # plots minimum value for each month
     ax.plot(x, max, label='Maximum')  # plots maximum value for each month
-    ax.legend(title=legendtitle)  # creates legend with specified title
+    ax.legend()  # creates legend with specified title
     # specify the path for the .png output
     path = dir_name + '/' + filename
     # saves .png to specified folder
@@ -238,7 +238,7 @@ def main():
         title="Choose save location for graphs:")
 
     # Set graph text sizes
-    text_size(SMALL_SIZE=10, MEDIUM_SIZE=14, BIGGER_SIZE=18)
+    text_size(EXTRA_SMALL_SIZE = 12, SMALL_SIZE=15, MEDIUM_SIZE=20, LARGE_SIZE=25)
 
     # Download data from APIs
     prescribing_df = download('https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L',  # API for number of antibiotics prescribed by practice in Manchester CCG
@@ -304,7 +304,7 @@ def main():
 
     # Plot graph of mean +- 1 standard deviation for Manchester CCG----------------------------------------------------------------------------------------------------------------------------------------------
     mean_stdev_plot(x=prescribe_stats['date'], y=prescribe_stats['mean'], title='Mean ± one standard deviation of antibiotics prescribed per 1000 patients for GP practices in Manchester CCG', xlabel="Date",
-                    ylabel="Antibiotics prescribed per 1000 patients", min=prescribe_stats['min'], max=prescribe_stats['max'], std=prescribe_stats['std'], dir_name=dirname, filename="Mean_and_sd_antibiotics_per_1000_patients.png", legendtitle="Antibiotics prescribed per 1000 people")
+                    ylabel="Antibiotics prescribed per 1000 patients", min=prescribe_stats['min'], max=prescribe_stats['max'], std=prescribe_stats['std'], dir_name=dirname, filename="Mean_and_sd_antibiotics_per_1000_patients.png")
 
     # Plot graph of mean with outliers---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -329,3 +329,4 @@ if __name__ == "__main__":
     print("Analysis complete: graphs saved as png files")
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
