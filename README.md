@@ -51,7 +51,9 @@ The script will attempt to acquire two sets of data for GP practices in Manchest
 *The number of antibiotic prescription events per GP practice per month. 
 *The number of patients registered at each GP practice per month.
 
-The script will then produce a set of six graphical outputs to display this data in a way that can be more easily interpreted by the user. 
+Progress is indicated by messages in the terminal. A box will appear part way through the analysis asking for the user to specify a location for saving the output graph files. If the user does not specify a filesave location (i.e. clicks the cancel or close button), the analysis will be terminated. 
+
+After specifying a filesave location, a set of six graphical outputs will be produced, displaying the antibiotic prescription data for GP practices in Manchester CCG in a way that can be more easily interpreted by the user. 
 
 ### Antibiotics prescribed in Manchester CCG
 ![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/antibiotics_prescribed_in_Manchester_over_time.png)
