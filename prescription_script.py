@@ -17,12 +17,6 @@ import tkinter as tk
 
 # DEFINE FUNCTIONS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Create directory for graphical outputs
-def create_directory(graphs):
-    if os.path.exists(graphs):
-        shutil.rmtree(graphs)  # removes directory if already exists
-    os.makedirs(graphs)  # creates directory
-
 
 # DATA CALCULATION FUNCTIONS
 
@@ -108,6 +102,24 @@ def outlier_merge(outlier_df, original_df, columns):
 
 # GRAPH PLOTTING FUNCTIONS
 
+# Create directory for graphical outputs
+def create_directory(graphs):
+    if os.path.exists(graphs):
+        shutil.rmtree(graphs)  # removes directory if already exists
+    os.makedirs(graphs)  # creates directory
+
+# Choose a directory for saving graphs
+def choose_directory(title, folder):
+    create_directory(graphs = 'graphs') # creates graphs directory
+    # Opens a GUI for user to specify filesave folder for graphs (in case they do not want to use the created graph folder) 
+    # converts directory name from tuple to string so it can be joined to create a filepath
+    directory = ''.join(tk.filedialog.askdirectory(title = title)) 
+    if directory == '': #If user does not specify a filesave location (closes the window), use graphs directory by default
+        dirname = folder 
+    else:
+         dirname = directory
+    return dirname
+
 # Set text size for plots
 def text_size(EXTRA_SMALL_SIZE, SMALL_SIZE, MEDIUM_SIZE, LARGE_SIZE):
     # fontsize of the axes title, and x and y labels
@@ -137,7 +149,7 @@ def line_plot(x, y, title, xlabel, ylabel, dir_name, filename, prescribing_df):
         # plot a line for each set of grouped data
         ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key)
     # legend has two columns, and sits outside the plot
-    ax.legend(bbox_to_anchor=(1.01, 1.05), ncol=2)
+    ax.legend(bbox_to_anchor=(1.01, 1.05))
     # specify the path for the .png output
     path = dir_name + '/' + filename
     # saves .png to specified folder
@@ -230,12 +242,12 @@ def test_colnames(df, colnames):
         print("     >Error: expected column names not present.")
 
 
+
 # Main method ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def main():
-    # Specify global directory for saving graphs
-    dirname = tk.filedialog.askdirectory(
-        title="Choose save location for graphs:")
+    # Determine the directory for saving the output .png
+    dirname = choose_directory(title = "Choose save location for graphs:", folder = 'graphs')
 
     # Set graph text sizes
     text_size(EXTRA_SMALL_SIZE = 12, SMALL_SIZE=15, MEDIUM_SIZE=20, LARGE_SIZE=25)
@@ -247,6 +259,7 @@ def main():
                               "spending-by-practice-0501.csv",
                               "Total-list-size-14L.csv"
                               )
+
     # test dataframe looks correct
     test_correct_dataframe(prescribing_df, 'Original ', "Error: ")
     # test expected columns are present
@@ -324,9 +337,9 @@ def main():
 
 
 if __name__ == "__main__":
-    print("Starting analysis")
+    print("Starting analysis...")
     main()
-    print("Analysis complete: graphs saved as png files")
+    print("Analysis complete: graphs saved as png files.")
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
