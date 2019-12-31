@@ -20,38 +20,40 @@ import tkinter as tk
 
 # DATA CALCULATION FUNCTIONS
 
-# Create dataframe from API data
+# Create dataframe from data using API key
 def get_api_data(api):
     try:
+        # get data using API keys
         return pd.DataFrame.from_dict(requests.get(api).json())
     except:
-        print("Could not download from API")
+        print("Could not download from API.")  # print error message
 
 
-# Create dataframe from CSV data
+# Create dataframe from data using CSV
 def get_csv_data(csv):
     try:
-        return pd.read_csv(csv)
+        return pd.read_csv(csv)  # get data from CSV
     except:
-        print("Data could not be loaded from csv files")
+        print("Data could not be loaded from csv files.")  # print error message
 
 
-# Download and merge prescribing data
-# Specifies inputs for defined function
+# Get prescribing data for Manchester CCG, and merge datasets
 def download(spendingAPI, listsizeAPI, size_csv, prescribing_csv):
+    # get data on number of antibiotic prescriptions per GP practice
     prescribe_data = get_api_data(spendingAPI)
+    # get data on number of registered patients per GP practice
     size_data = get_api_data(listsizeAPI)
-
+    # if prescriptions data can't be downloaded using API keys, use CSV data
     if prescribe_data is None:
-        print("Prescriptions data could not be downloaded from APIs, trying csv files")
+        print("Prescriptions data could not be downloaded from APIs, trying csv files.")
         prescribe_data = get_csv_data(prescribing_csv)
         if prescribe_data is None:
-            print("Prescriptions data could not be obtained from CSVs")
+            print("Prescriptions data could not be obtained from CSVs.")
         if prescribe_data is not None:
-            print("Prescriptions data was obtained from CSV")
+            print("Prescriptions data was obtained from CSV.")
     else:
-        print("Prescriptions data obtained from APIs")
-
+        print("Prescriptions data obtained from APIs.")
+    # if size data can't be downloaded using API keys, use CSV data
     if size_data is None:
         print("Patient numbers data could not be downloaded from APIs, trying csv files")
         size_data = get_csv_data(size_csv)
@@ -61,7 +63,7 @@ def download(spendingAPI, listsizeAPI, size_csv, prescribing_csv):
             print("Patient numbers data was obtained from CSV")
     else:
         print("Patient numbers data obtained from APIs")
-
+    # merge the two datasets
     if size_data is not None and prescribe_data is not None:
         return pd.merge(prescribe_data[['date', 'items', 'row_id', 'row_name']], size_data, on=['row_id', 'date', 'row_name'])
 
@@ -71,32 +73,32 @@ def calculate_outliers_iqr_method(values):
     q1 = values.quantile(q=0.25)  # calculates lower quartile
     q3 = values.quantile(q=0.75)  # calculates upper quartlie
     iqr = q3 - q1  # calculates interquartile range (iqr)
-
     outliers = []  # creates empty list for outliers
+    # if values are outside mean ± 1.5x iqr, append to outliers list
     for value in values:
-        # if values are outside mean ± 1.5x iqr, append to outliers list
         if value > q3 + 1.5*iqr or value < q1 - 1.5*iqr:
             outliers.append(value)
-    return outliers  # returns a list of outlier values
+    return outliers  # return list of outliers
 
 
 # Create new dataframe with outliers and corresponding dates
 def add_dates_to_outliers(unique_dates, column_names, prescribing_df):
-    outlier_list = []  # creates an empty list for outliers to be appended to
-    for date in unique_dates:  # from a list of unique date values in prescribig_df
+    outlier_list = []  # creates empty list for appending outliers
+    # from a list of unique date values in prescribing_df, calculate a list of outlier values for grouped data within each month (from 'items_per_1000' values)
+    for date in unique_dates:
         outliers = calculate_outliers_iqr_method(
-            prescribing_df[prescribing_df['date'] == date]['items_per_1000'])  # calculate a list of outlier values from the 'items_per_1000' values within the grouped date values for each month
+            prescribing_df[prescribing_df['date'] == date]['items_per_1000'])
+    # append outliers and corresponding dates (from unique date values in prescribing_df) to a list
         for outlier in outliers:
-            # appends outlier values from 'outliers' to a dataframe, along with corresponding date from the unique date values in prescribing_df
             outlier_list.append([date, outlier])
-    # create a dataframe of outliers and dates from 'outlier_list'
+    # create dataframe of outliers and dates
     return pd.DataFrame(outlier_list, columns=column_names)
 
 
 # Merge outliers with original dataframe
 def outlier_merge(outlier_df, original_df, columns):
-    subset = pd.DataFrame(original_df[['date', 'items_per_1000', 'row_name']])
     # puts outliers list into a dataframe with 2 columns, and merges on 'date' and 'items_per_1000' with a subset of prescribing_df
+    subset = pd.DataFrame(original_df[['date', 'items_per_1000', 'row_name']])
     return pd.merge(outlier_df, subset, on=columns)
 
 
@@ -108,110 +110,107 @@ def create_directory(graphs):
         shutil.rmtree(graphs)  # removes directory if already exists
     os.makedirs(graphs)  # creates directory
 
+
 # Choose a directory for saving graphs
 def choose_directory(title, folder):
-    create_directory(graphs = 'graphs') # creates graphs directory
-    # Opens a GUI for user to specify filesave folder for graphs (in case they do not want to use the created graph folder) 
-    # converts directory name from tuple to string so it can be joined to create a filepath
-    directory = ''.join(tk.filedialog.askdirectory(title = title)) 
-    if directory == '': #If user does not specify a filesave location (closes the window), use graphs directory by default
-        dirname = folder 
-    else:
-         dirname = directory
+    create_directory(graphs='graphs')  # creates directory named 'graphs'
+    # Opens a GUI for user to specify folder for saving graphs (alternative to created 'graphs' folder)
+    # converts specifed folder name from tuple to string
+    directory = ''.join(tk.filedialog.askdirectory(title=title))
+    # If user does not specify a filesave location (closes the window), use graphs directory by default
+    if directory == '':
+        dirname = folder
+    else:  # If user has specified a filesave location, use that as dirname
+        dirname = directory
     return dirname
+
+
+# Specify path for .png outputs
+def define_path(dir_name, filename):
+    return dir_name + '/' + filename  # specifies path for .png outputs
+
 
 # Set text size for plots
 def text_size(EXTRA_SMALL_SIZE, SMALL_SIZE, MEDIUM_SIZE, LARGE_SIZE):
-    # fontsize of the axes title, and x and y labels
+    # figure title, and x and y title labels
     plt.rc('axes', titlesize=LARGE_SIZE, labelsize=MEDIUM_SIZE)
-    plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the x tick (x-value) labels
-    plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the y tick (y-value) labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)  # y-axis labels font size
+    plt.rc('ytick', labelsize=SMALL_SIZE)  # x-axis labels font size
     plt.rc('legend', fontsize=EXTRA_SMALL_SIZE)  # legend fontsize
 
 
 # Set generic plot layout
 def plot_layout(xlabel, ylabel, title):
-    global fig, ax
-    fig, ax = plt.subplots(figsize=(30, 15))  # Creates figure of specified
+    global fig, ax  # defines axes object as global
+    # Creates figure of specified dimensions
+    fig, ax = plt.subplots(figsize=(30, 15))
     plt.title(title)  # specifies graph title
     plt.xlabel(xlabel)  # specifies x-axis label
     plt.ylabel(ylabel)  # specifies y-axis label
-    # rotates axis labels 90 degrees (makes them readable)
+    # rotates x-axis labels 90 degrees (makes them readable)
     plt.xticks(rotation=90)
 
 
 # Line plots
 def line_plot(x, y, title, xlabel, ylabel, dir_name, filename, prescribing_df):
     print("Plotting line plot...")
-    global ax
-    plot_layout(xlabel, ylabel, title)
+    global ax  # defines axes object as global
+    plot_layout(xlabel, ylabel, title)  # specifies plot layout
     for key, grp in prescribing_df.groupby(['row_name']):
-        # plot a line for each set of grouped data
+        # plot a line for each GP practice
         ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key)
-    # legend has two columns, and sits outside the plot
-    ax.legend(bbox_to_anchor=(1.01, 1.05))
-    # specify the path for the .png output
-    path = dir_name + '/' + filename
+    ax.legend(bbox_to_anchor=(1.01, 1.05), ncol = 2)  # legend situated outside the plot, with 2 columns
     # saves .png to specified folder
-    return plt.close(fig.savefig(path, format='png', dpi=200))
+    return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200))
 
 
 # Standard deviation plot
 def mean_stdev_plot(x, y, title, xlabel, ylabel, dir_name, filename, min, max, std):
     print("Plotting standard deviation plot...")
-    plot_layout(xlabel, ylabel, title)
+    plot_layout(xlabel, ylabel, title)  # specifies plot layout
     ax.plot(x, y, label='Mean')  # plots mean line
     # shades ± one standard deviation of mean in grey
     plt.fill_between(x, y - std, y + std, color='#888888',
                      alpha=0.4, label='Standard deviation')
     ax.plot(x, min, label='Minimum')  # plots minimum value for each month
     ax.plot(x, max, label='Maximum')  # plots maximum value for each month
-    ax.legend()  # creates legend with specified title
-    # specify the path for the .png output
-    path = dir_name + '/' + filename
+    ax.legend()  # creates legend
     # saves .png to specified folder
-    return plt.close(fig.savefig(path, format='png', dpi=200))
+    return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200))
 
 
-# Scatter plot on mean line plot
+# Scatter plot with mean line
 def scatter_plot(x, y, title, xlabel, ylabel, dir_name, filename, scatter_x, scatter_y, hue, data):
     print("Plotting scatter plot...")
-    global ax
-    plot_layout(xlabel, ylabel, title)
+    global ax  # defines axes object as global
+    plot_layout(xlabel, ylabel, title)  # specifies plot layout
     ax.plot(x, y, label='Mean')  # plots mean line
-    # plots outlier data as scatter graph (each practice is a different colour)
+    # plots outliers as scatter graph with GP practice specified by colour key
     ax = sns.scatterplot(x=scatter_x, y=scatter_y,
                          hue=hue, data=data, legend='full')
-    # specify the path for the .png output
-    path = dir_name + '/' + filename
     # saves .png to specified folder
-    return plt.close(fig.savefig(path, format='png', dpi=200))
+    return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200))
 
 
-# Boxplot function using seaborn
+# Boxplot using seaborn
 def box_plot(x, y, xlabel, ylabel, title, dir_name, filename):
     print("Plotting boxplot...")
-    plot_layout(xlabel, ylabel, title)
-    fig = sns.boxplot(x, y)  # plots boxplot from specified x and y values
-    # specify the path for the .png output
-    path = dir_name + '/' + filename
-    return fig.figure.savefig(path, format='png',
+    plot_layout(xlabel, ylabel, title)  # specifies plot layout
+    fig = sns.boxplot(x, y)  # plots boxplot
+    return fig.figure.savefig(define_path(dir_name, filename), format='png',
                               dpi=200)  # saves .png to specified folder
 
 
-# Plots a heatmap where low prescribing is blue and high prescribing is red, robust sets contrast levels based on quantiles
+# Heatmap
 def heatmap(df, index, columns, values, xlabel, ylabel, title, dir_name, filename):
     print("Plotting heatmap...")
     # pivots data frame so that it gives items per 1000 by practice over time
     data_by_practice = df.pivot(index, columns, values)
     plot_layout(xlabel, ylabel, title)
     plot = sns.heatmap(data_by_practice, cmap='coolwarm',
-                       robust=True)  # plots the heatmap
-    fig = plot.get_figure()
-    # specify the path for the .png output
-    path = dir_name + '/' + filename
-    return fig.savefig(path, format='png',
-                       dpi=200)  # saves .png to specified folder
+                       robust=True)  # plots the heatmap. 'robust' computes colourmap range using robust quantiles instead of extreme values.
+    return plot.get_figure().savefig(define_path(dir_name, filename), format='png',
+                                     dpi=200)  # saves .png to specified folder
 
 
 # TEST FUNCTIONS
@@ -242,15 +241,16 @@ def test_colnames(df, colnames):
         print("     >Error: expected column names not present.")
 
 
-
 # Main method ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def main():
     # Determine the directory for saving the output .png
-    dirname = choose_directory(title = "Choose save location for graphs:", folder = 'graphs')
+    dirname = choose_directory(
+        title="Choose save location for graphs:", folder='graphs')
 
     # Set graph text sizes
-    text_size(EXTRA_SMALL_SIZE = 12, SMALL_SIZE=15, MEDIUM_SIZE=20, LARGE_SIZE=25)
+    text_size(EXTRA_SMALL_SIZE=12, SMALL_SIZE=15,
+              MEDIUM_SIZE=20, LARGE_SIZE=25)
 
     # Download data from APIs
     prescribing_df = download('https://openprescribing.net/api/1.0/spending_by_practice/?code=5.1&format=json&org=14L',  # API for number of antibiotics prescribed by practice in Manchester CCG
@@ -342,4 +342,3 @@ if __name__ == "__main__":
     print("Analysis complete: graphs saved as png files.")
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
