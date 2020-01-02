@@ -139,35 +139,32 @@ def text_size(EXTRA_SMALL_SIZE, SMALL_SIZE, MEDIUM_SIZE, LARGE_SIZE):
     plt.rc('legend', fontsize=EXTRA_SMALL_SIZE)  # legend fontsize
 
 
-# Set generic plot layout
-def plot_layout(xlabel, ylabel, title):
-    global fig, ax  # defines axes object as global
-    # Creates figure of specified dimensions
+# Line plots
+def line_plot(x, y, title, xlabel, ylabel, dir_name, filename, prescribing_df):
+    print("Plotting line plot...")
     fig, ax = plt.subplots(figsize=(30, 15))
     plt.title(title)  # specifies graph title
     plt.xlabel(xlabel)  # specifies x-axis label
     plt.ylabel(ylabel)  # specifies y-axis label
     # rotates x-axis labels 90 degrees (makes them readable)
     plt.xticks(rotation=90)
-
-
-# Line plots
-def line_plot(x, y, title, xlabel, ylabel, dir_name, filename, prescribing_df):
-    print("Plotting line plot...")
-    global ax  # defines axes object as global
-    plot_layout(xlabel, ylabel, title)  # specifies plot layout
     for key, grp in prescribing_df.groupby(['row_name']):
         # plot a line for each GP practice
-        ax = grp.plot(ax=ax, kind='line', x=x, y=y, label=key)
+        grp.plot(ax=ax, kind='line', x=x, y=y, label=key)
     ax.legend(bbox_to_anchor=(1.01, 1.05), ncol = 2)  # legend situated outside the plot, with 2 columns
     # saves .png to specified folder
-    return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200))
+    return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200, bbox_inches='tight'))
 
 
 # Standard deviation plot
 def mean_stdev_plot(x, y, title, xlabel, ylabel, dir_name, filename, min, max, std):
     print("Plotting standard deviation plot...")
-    plot_layout(xlabel, ylabel, title)  # specifies plot layout
+    fig, ax = plt.subplots(figsize=(30, 15))
+    plt.title(title)  # specifies graph title
+    plt.xlabel(xlabel)  # specifies x-axis label
+    plt.ylabel(ylabel)  # specifies y-axis label
+    # rotates x-axis labels 90 degrees (makes them readable)
+    plt.xticks(rotation=90)
     ax.plot(x, y, label='Mean')  # plots mean line
     # shades ± one standard deviation of mean in grey
     plt.fill_between(x, y - std, y + std, color='#888888',
@@ -176,29 +173,35 @@ def mean_stdev_plot(x, y, title, xlabel, ylabel, dir_name, filename, min, max, s
     ax.plot(x, max, label='Maximum')  # plots maximum value for each month
     ax.legend()  # creates legend
     # saves .png to specified folder
-    return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200))
+    return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200, bbox_inches='tight'))
 
 
 # Scatter plot with mean line
 def scatter_plot(x, y, title, xlabel, ylabel, dir_name, filename, scatter_x, scatter_y, hue, data):
     print("Plotting scatter plot...")
-    global ax  # defines axes object as global
-    plot_layout(xlabel, ylabel, title)  # specifies plot layout
+    fig, ax = plt.subplots(figsize=(30, 15))
+    # rotates x-axis labels 90 degrees (makes them readable)
+    plt.xticks(rotation=90)
     ax.plot(x, y, label='Mean')  # plots mean line
     # plots outliers as scatter graph with GP practice specified by colour key
     ax = sns.scatterplot(x=scatter_x, y=scatter_y,
                          hue=hue, data=data, legend='full')
+    ax.set(xlabel=xlabel, ylabel=ylabel, title=title) #sets axes and title names
+    ax.legend(bbox_to_anchor=(1.17, 1.0))  # legend situated outside the plot, with 2 columns
     # saves .png to specified folder
-    return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200))
+    return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200, bbox_inches='tight'))
 
 
 # Boxplot using seaborn
 def box_plot(x, y, xlabel, ylabel, title, dir_name, filename):
     print("Plotting boxplot...")
-    plot_layout(xlabel, ylabel, title)  # specifies plot layout
+    fig, ax = plt.subplots(figsize=(30, 15))
+    # rotates x-axis labels 90 degrees (makes them readable)
+    plt.xticks(rotation=90)
     fig = sns.boxplot(x, y)  # plots boxplot
+    ax.set(xlabel=xlabel, ylabel=ylabel, title=title) #sets axes and title names
     return fig.figure.savefig(define_path(dir_name, filename), format='png',
-                              dpi=200)  # saves .png to specified folder
+                              dpi=200, bbox_inches='tight')  # saves .png to specified folder
 
 
 # Heatmap
@@ -206,11 +209,14 @@ def heatmap(df, index, columns, values, xlabel, ylabel, title, dir_name, filenam
     print("Plotting heatmap...")
     # pivots data frame so that it gives items per 1000 by practice over time
     data_by_practice = df.pivot(index, columns, values)
-    plot_layout(xlabel, ylabel, title)
+    fig, ax = plt.subplots(figsize=(30, 15))
+    # rotates x-axis labels 90 degrees (makes them readable)
+    plt.xticks(rotation=90)
     plot = sns.heatmap(data_by_practice, cmap='coolwarm',
                        robust=True)  # plots the heatmap. 'robust' computes colourmap range using robust quantiles instead of extreme values.
+    ax.set(xlabel=xlabel, ylabel=ylabel, title=title) #sets axes and title names
     return plot.get_figure().savefig(define_path(dir_name, filename), format='png',
-                                     dpi=200)  # saves .png to specified folder
+                                     dpi=200, bbox_inches='tight')  # saves .png to specified folder
 
 
 # TEST FUNCTIONS
