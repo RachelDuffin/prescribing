@@ -76,5 +76,5 @@ To highlight the GP practices and months for which prescribing falls outside of 
 The boxplot above was created from the antibiotics prescribed per 1000 registered patients each month in Manchester CCG. The box of each boxplot show the median and middle 50% of values, with the whiskers showing the highest and lowest values excluding any outliers. Outliers have been displayed as black diamonds. 
 
 ### Heatmap of antibotics prescribed in Manchester CCG:
-![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/heatmap.png)
+![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/Heatmap.png)
 The key is indicated on the right, with number of prescriptions per 1000 registered patients for each month at each GP practice in Manchester indicated by the key on the right (high number of prescriptions are displayed in red, and low in blue). This provides an easy visual summary of which practices and which months contain the highest and lowest number of prescriptions. 
