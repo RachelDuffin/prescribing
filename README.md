@@ -56,25 +56,25 @@ Progress is indicated by messages in the terminal. A box will appear part way th
 After specifying a filesave location, a set of six graphical outputs will be produced, displaying the antibiotic prescription data for GP practices in Manchester CCG in a way that can be more easily interpreted by the user. 
 
 ### Antibiotics prescribed in Manchester CCG
-![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/antibiotics_prescribed_in_Manchester_over_time.png)
+![]()
 This graph visualises the number of prescription events by each GP practice in Manchester CCG for each month in each year currently available on openprescribing.net. Each GP practice is represented by a coloured line as described in the key, enabling a visualisation of the trends for each GP practice in prescribing over time. However, this graph has obvious drawbacks. It is not very clear due to the large number of GP practices present in Manchester CCG meaning many lines are present on the graph. Additionally, different GP practices have different numbers of patients registered so this graph does not allow comparison of prescribing between different GP practices. To solve this second problem, the graph below is generated:
 
 ### Normalised antibotics prescribed in Manchester CCG:
-![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/normalised_antibiotics_prescribed_in_manchester_over_time.png)
+![]()
 This graph is similar to the graph above, however the data displayed has been normalised. Each line represents that prescriptions per 1000 registered patients for that GP practice, allowing better comparison between GP practices within Manchester. However, this graph is still difficult to interpret due to the large number of GP practices that have been plotted. 
 
 ### Mean, max, min and standard deviation plot:
-![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/Mean_and_sd_antibiotics_per_1000_patients.png)
+![]()
 This graph gives a more general indication of the trends in prescribing in Manchester CCG as a whole. The mean prescriptions in Manchester CCG for each month per 1000 registered patients have been plotted, with one standard deviation either side of the mean highlighted in grey. The maximum and minimum number of antibiotics prescribed by individual GP practices each month are plotted. This gives an overall visualisation of the spread of the data. 
 
 ### Outliers for antibiotic prescriptions in Manchester CCG:
-![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/Prescription_outliers_in_Manchester_CCG.png)
+![]()
 To highlight the GP practices and months for which prescribing falls outside of the expected range of values, a graph plotting the outliers and mean line for antibitoics prescribed per 1000 registered patients was created. GP practice names corresponding to each outlier are indicated in the key. 
 
 ### Box plot of antibiotics prescribed in Manchester CCG:
-![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/Box_plot.png) 
+![]() 
 The boxplot above was created from the antibiotics prescribed per 1000 registered patients each month in Manchester CCG. The box of each boxplot show the median and middle 50% of values, with the whiskers showing the highest and lowest values excluding any outliers. Outliers have been displayed as black diamonds. 
 
 ### Heatmap of antibotics prescribed in Manchester CCG:
-![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/Heatmap.png)
+![]()
 The key is indicated on the right, with number of prescriptions per 1000 registered patients for each month at each GP practice in Manchester indicated by the key on the right (high number of prescriptions are displayed in red, and low in blue). This provides an easy visual summary of which practices and which months contain the highest and lowest number of prescriptions. 
