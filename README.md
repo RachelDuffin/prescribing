@@ -72,7 +72,7 @@ This graph gives a more general indication of the trends in prescribing in Manch
 To highlight the GP practices and months for which prescribing falls outside of the expected range of values, a graph plotting the outliers and mean line for antibitoics prescribed per 1000 registered patients was created. GP practice names corresponding to each outlier are indicated in the key. 
 
 ### Box plot of antibiotics prescribed in Manchester CCG:
-![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/Box_plot.png)
+![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/Box_plot.png) 
 The boxplot above was created from the antibiotics prescribed per 1000 registered patients each month in Manchester CCG. The box of each boxplot show the median and middle 50% of values, with the whiskers showing the highest and lowest values excluding any outliers. Outliers have been displayed as black diamonds. 
 
 ### Heatmap of antibotics prescribed in Manchester CCG:
