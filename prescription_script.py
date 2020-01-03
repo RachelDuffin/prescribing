@@ -143,15 +143,15 @@ def text_size(EXTRA_SMALL_SIZE, SMALL_SIZE, MEDIUM_SIZE, LARGE_SIZE):
 def line_plot(x, y, title, xlabel, ylabel, dir_name, filename, prescribing_df):
     print("Plotting line plot...")
     fig, ax = plt.subplots(figsize=(30, 15))
-    plt.title(title)  # specifies graph title
-    plt.xlabel(xlabel)  # specifies x-axis label
-    plt.ylabel(ylabel)  # specifies y-axis label
     # rotates x-axis labels 90 degrees (makes them readable)
     plt.xticks(rotation=90)
     for key, grp in prescribing_df.groupby(['row_name']):
         # plot a line for each GP practice
         grp.plot(ax=ax, kind='line', x=x, y=y, label=key)
     ax.legend(bbox_to_anchor=(1.01, 1.05), ncol = 2)  # legend situated outside the plot, with 2 columns
+    plt.title(title)  # specifies graph title
+    plt.ylabel(ylabel)  # specifies y-axis label
+    plt.xlabel(xlabel)  # specifies x-axis label
     # saves .png to specified folder
     return plt.close(fig.savefig(define_path(dir_name, filename), format='png', dpi=200, bbox_inches='tight'))
 
