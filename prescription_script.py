@@ -142,7 +142,7 @@ def text_size(EXTRA_SMALL_SIZE, SMALL_SIZE, MEDIUM_SIZE, LARGE_SIZE):
 
 # Line plots
 def line_plot(x, y, title, xlabel, ylabel, dir_name, filename, prescribing_df):
-    print("Plotting line plot...")
+    print("Plotting all data as a line graph...")
     fig, ax = plt.subplots(figsize=(30, 15))
     # rotates x-axis labels 90 degrees (makes them readable)
     plt.xticks(rotation=90)
@@ -159,7 +159,7 @@ def line_plot(x, y, title, xlabel, ylabel, dir_name, filename, prescribing_df):
 
 # Standard deviation plot
 def mean_stdev_plot(x, y, title, xlabel, ylabel, dir_name, filename, min, max, std):
-    print("Plotting standard deviation plot...")
+    print("Plotting mean and standard deviation as a line graph...")
     fig, ax = plt.subplots(figsize=(30, 15))
     plt.title(title)  # specifies graph title
     plt.xlabel(xlabel)  # specifies x-axis label
@@ -179,7 +179,7 @@ def mean_stdev_plot(x, y, title, xlabel, ylabel, dir_name, filename, min, max, s
 
 # Scatter plot with mean line
 def scatter_plot(x, y, title, xlabel, ylabel, dir_name, filename, scatter_x, scatter_y, hue, data):
-    print("Plotting scatter plot...")
+    print("Plotting GP practice outliers as a scatter plot...")
     fig, ax = plt.subplots(figsize=(30, 15))
     # rotates x-axis labels 90 degrees (makes them readable)
     plt.xticks(rotation=90)
@@ -195,7 +195,7 @@ def scatter_plot(x, y, title, xlabel, ylabel, dir_name, filename, scatter_x, sca
 
 # Boxplot using seaborn
 def box_plot(x, y, xlabel, ylabel, title, dir_name, filename):
-    print("Plotting boxplot...")
+    print("Plotting all data as a boxplot with outliers shown...")
     fig, ax = plt.subplots(figsize=(30, 15))
     # rotates x-axis labels 90 degrees (makes them readable)
     plt.xticks(rotation=90)
@@ -207,7 +207,7 @@ def box_plot(x, y, xlabel, ylabel, title, dir_name, filename):
 
 # Heatmap
 def heatmap(df, index, columns, values, xlabel, ylabel, title, dir_name, filename):
-    print("Plotting heatmap...")
+    print("Plotting heatmap of prescribing by GP practice...")
     # pivots data frame so that it gives items per 1000 by practice over time
     data_by_practice = df.pivot(index, columns, values)
     fig, ax = plt.subplots(figsize=(30, 15))
