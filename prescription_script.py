@@ -317,8 +317,8 @@ def main():
               xlabel="Date", ylabel="Number of antibiotics prescribed", prescribing_df=prescribing_df)  # plot basic graph showing number of antibiotics prescribed by each practice each month over time
 
     # Plot graph of normalised antibiotics prescribed by GP practices in Manchester over time
-    line_plot(x='date', y='items_per_1000', title="Graph of antibiotics prescribed per 1000 patients by GP practices in Manchester CCG over time", dir_name=dirname, filename="normalised_antibiotics_prescribed_in_manchester_over_time.png",
-              xlabel="Date", ylabel="Number of antibiotics prescribed", prescribing_df=prescribing_df)  # plots normalised graph accounting for patient population size (prescribed items per 1,000 registered patients)
+    line_plot(x='date', y='items_per_1000', title="Antibiotics prescribed per 1000 patients by GP practices in Manchester CCG over time", dir_name=dirname, filename="normalised_antibiotics_prescribed_in_manchester_over_time.png",
+              xlabel="Date", ylabel="Number of antibiotics prescribed per 1000 patients", prescribing_df=prescribing_df)  # plots normalised graph accounting for patient population size (prescribed items per 1,000 registered patients)
 
     # Plot graphs of mean for whole Manchester CCG---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -328,17 +328,17 @@ def main():
 
     # Plot graph of mean with outliers---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    scatter_plot(x=prescribe_stats['date'], y=prescribe_stats['mean'], title='Prescription outliers in Manchester CCG', xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients', dir_name=dirname,
+    scatter_plot(x=prescribe_stats['date'], y=prescribe_stats['mean'], title='Prescription outliers by GP practice in Manchester CCG', xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients', dir_name=dirname,
                  filename='Prescription_outliers_in_Manchester_CCG.png', scatter_x=outlier_practice['date'], scatter_y=outlier_practice['items_per_1000'], hue=outlier_practice.row_name, data=outlier_practice)
 
     # Plot boxplot showing spread of data within each month------------------------------------------------------------------------------------------------------------------------------------------------------
     # use seaborn to plot boxplot of month vs antibiotics prescribed per 1000 patients
     box_plot(x=prescribing_df['date'], y=prescribing_df['items_per_1000'], xlabel='Date', ylabel='Antibiotics prescribed per 1000 patients',
-             title='Boxplot showing antibiotics prescribed per 1000 patients in Manchester CCG per month', dir_name=dirname, filename="Box_plot.png")
+             title='Antibiotics prescribed per 1000 patients in Manchester CCG per month', dir_name=dirname, filename="Box_plot.png")
 
     # Create a heatmap-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     heatmap(df=prescribing_df, index='row_name', columns='date', values='items_per_1000', xlabel='Date', ylabel='GP Practice in Manchester',
-            title='Antibiotics prescribed per 1000 patients in Manchester CCG by practice', dir_name=dirname, filename='Heatmap.png')
+            title='Antibiotics prescribed per 1000 patients in Manchester CCG by GP practice', dir_name=dirname, filename='Heatmap.png')
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
