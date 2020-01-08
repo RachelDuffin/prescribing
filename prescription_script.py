@@ -75,7 +75,7 @@ def calculate_outliers_iqr_method(values):
     q3 = values.quantile(q=0.75)  # calculates upper quartlie
     iqr = q3 - q1  # calculates interquartile range (iqr)
     outliers = []  # creates empty list for outliers
-    # if values are outside mean ± 1.5x iqr, append to outliers list
+    # if values are outside the upper or lower quartile by more than 1.5x iqr then they are an outlier, append to outliers list
     for value in values:
         if value > q3 + 1.5*iqr or value < q1 - 1.5*iqr:
             outliers.append(value)
