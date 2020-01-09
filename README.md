@@ -48,14 +48,17 @@ To run the python script, run:
 python3 prescription_script.py
 ```
 The script will attempt to acquire two sets of data for GP practices in Manchester Clinical Commissioning Group (CCG) using two API keys provided by openprescribing.net. These sets of data are: 
-*The number of antibiotic prescription events per GP practice per month. 
-*The number of patients registered at each GP practice per month.
-
+* The number of antibiotic prescription events per GP practice per month. 
+    * This is indicated by the 'items' column in the dataframe (number of times a medicine has been prescribed).
+    * This dataframe also includes a 'quantity' column (total amount of a medication prescribed).
+    * The units of 'quantity' depend on the form of the drug (tablet, liquid, inhaler etc.) therefore are not a reliable measure of prescription events.
+    * Therefore this script plots items (or items per 1000 patients where the data have been normalised) in each graph.
+* The number of patients registered at each GP practice per month.
+    * This is indicated by the 'total_list_size' column in the dataframe.
+    
 Progress is indicated by messages in the terminal. A box will appear part way through the analysis asking for the user to specify a location for saving the output graph files. If the user does not specify a filesave location (i.e. clicks the cancel or close button), the default filesave location 'graphs' is used. 
 
 After specifying a filesave location, a set of six graphical outputs will be produced, displaying the antibiotic prescription data for GP practices in Manchester CCG in a way that can be more easily interpreted by the user. 
-
-openprescribing.net provides data on number of items and quantity. Items is the number of times a medicine has been prescribed. Quantity is the total amount of a medication prescribed; the units depend on the form of the drug (tablet, liquid, inhaler, etc), so quantities cannot necessarily be added together as they could have different units. As such, this script plots items (or items per 1000 patients where the data have been normalised) in each graph.
 
 ### Antibiotics prescribed in Manchester CCG
 ![](https://github.com/RachelDuffin/prescribing/blob/master/graphs/antibiotics_prescribed_in_Manchester_over_time.png)
