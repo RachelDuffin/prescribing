@@ -210,7 +210,7 @@ def heatmap(df, index, columns, values, xlabel, ylabel, title, dir_name, filenam
     print("Plotting heatmap of prescribing by GP practice...")
     # pivots data frame so that it gives items per 1000 by practice over time
     data_by_practice = df.pivot(index, columns, values)
-    fig, ax = plt.subplots(figsize=(30, 15))
+    fig, ax = plt.subplots(figsize=(30, 30))
     # rotates x-axis labels 90 degrees (makes them readable)
     plt.xticks(rotation=90)
     plot = sns.heatmap(data_by_practice, cmap='coolwarm',
