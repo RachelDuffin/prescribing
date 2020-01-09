@@ -9,6 +9,7 @@ For this project, you must have the following packages installed on your system:
 ```
     Python 3
     PIP 3
+    git
 ```
 Check python3 is installed:
 ```
@@ -26,6 +27,24 @@ If not installed, install pip3:
 ```
 sudo apt-get install python3-pip
 ```
+Check git is installed:
+```
+which git
+```
+If not installed, install git:
+```
+sudo apt-get install git
+```
+
+Next, change the  directory to a suitable location for the project, and then download the content from the github repository: 
+```
+git clone https://github.com/RachelDuffin/prescribing.git
+```  
+
+Then change the directory so you are within the prescribing directory:
+```
+cd prescribing
+```
 
 ### Further package installation using virtualenv
 
@@ -34,6 +53,14 @@ It is recommended that you use virtualenv to create an isolated Python environme
 Install virtualenv:
 ```
 pip3 install virtualenv
+```
+Specify a path for your virtual environment:
+```
+virtualenv ENV
+```
+Activate the virtual environment:
+```
+source ENV/bin/activate
 ```
 
 The packages required to run the script are located in 'requirements.txt'. To install these packages, run:
