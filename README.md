@@ -62,7 +62,10 @@ Activate the virtual environment:
 ```
 source ENV/bin/activate
 ```
-
+Install the module tkinter (the GUI package):
+```
+sudo apt-get install python3-tk 
+```
 The packages required to run the script are located in 'requirements.txt'. To install these packages, run:
 ```
 pip3 install -r requirements.txt
